@@ -12,7 +12,7 @@ coroutines — no need to instantiate different classes or switch APIs.
 This is ideal for:
 - building apps that use both sync and async logic (e.g., CLI + event loop)
 - transitioning from sync to async without refactoring
-- libraries that want to be agnostic of the caller’s context
+- libraries that want to be agnostic of the caller's context
 
 ✅ No wrappers
 ✅ No separate client classes
@@ -20,7 +20,6 @@ This is ideal for:
 """
 
 # ─── Imports ──────────────────────────────────────────────
-import evrmore_rpc
 from evrmore_rpc import EvrmoreClient
 import asyncio
 
