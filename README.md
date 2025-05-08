@@ -24,9 +24,6 @@ A comprehensive Python client for interacting with Evrmore blockchain nodes thro
 ```bash
 # Basic installation
 pip install evrmore-rpc
-
-# With ZMQ support
-pip install evrmore-rpc[zmq]
 ```
 
 ## Quick Start
