@@ -1,47 +1,47 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
     <url>
-         <loc>https://manticoretechnology.github.io/evrmore-rpc/</loc>
-         <lastmod>2025-03-10</lastmod>
+         <loc>https://manticoretechnologies.github.io/evrmore-rpc-dev/</loc>
+         <lastmod>2025-05-08</lastmod>
     </url>
     <url>
-         <loc>https://manticoretechnology.github.io/evrmore-rpc/advanced/</loc>
-         <lastmod>2025-03-10</lastmod>
+         <loc>https://manticoretechnologies.github.io/evrmore-rpc-dev/advanced/</loc>
+         <lastmod>2025-05-08</lastmod>
     </url>
     <url>
-         <loc>https://manticoretechnology.github.io/evrmore-rpc/api/</loc>
-         <lastmod>2025-03-10</lastmod>
+         <loc>https://manticoretechnologies.github.io/evrmore-rpc-dev/api-reference/</loc>
+         <lastmod>2025-05-08</lastmod>
     </url>
     <url>
-         <loc>https://manticoretechnology.github.io/evrmore-rpc/api_reference/</loc>
-         <lastmod>2025-03-10</lastmod>
+         <loc>https://manticoretechnologies.github.io/evrmore-rpc-dev/api/</loc>
+         <lastmod>2025-05-08</lastmod>
     </url>
     <url>
-         <loc>https://manticoretechnology.github.io/evrmore-rpc/async_api/</loc>
-         <lastmod>2025-03-10</lastmod>
+         <loc>https://manticoretechnologies.github.io/evrmore-rpc-dev/api_reference/</loc>
+         <lastmod>2025-05-08</lastmod>
     </url>
     <url>
-         <loc>https://manticoretechnology.github.io/evrmore-rpc/development/</loc>
-         <lastmod>2025-03-10</lastmod>
+         <loc>https://manticoretechnologies.github.io/evrmore-rpc-dev/development/</loc>
+         <lastmod>2025-05-08</lastmod>
     </url>
     <url>
-         <loc>https://manticoretechnology.github.io/evrmore-rpc/examples/</loc>
-         <lastmod>2025-03-10</lastmod>
+         <loc>https://manticoretechnologies.github.io/evrmore-rpc-dev/examples/</loc>
+         <lastmod>2025-05-08</lastmod>
     </url>
     <url>
-         <loc>https://manticoretechnology.github.io/evrmore-rpc/models/</loc>
-         <lastmod>2025-03-10</lastmod>
+         <loc>https://manticoretechnologies.github.io/evrmore-rpc-dev/getting-started/</loc>
+         <lastmod>2025-05-08</lastmod>
     </url>
     <url>
-         <loc>https://manticoretechnology.github.io/evrmore-rpc/sync_api/</loc>
-         <lastmod>2025-03-10</lastmod>
+         <loc>https://manticoretechnologies.github.io/evrmore-rpc-dev/models/</loc>
+         <lastmod>2025-05-08</lastmod>
     </url>
     <url>
-         <loc>https://manticoretechnology.github.io/evrmore-rpc/websockets/</loc>
-         <lastmod>2025-03-10</lastmod>
+         <loc>https://manticoretechnologies.github.io/evrmore-rpc-dev/websockets/</loc>
+         <lastmod>2025-05-08</lastmod>
     </url>
     <url>
-         <loc>https://manticoretechnology.github.io/evrmore-rpc/zmq/</loc>
-         <lastmod>2025-03-10</lastmod>
+         <loc>https://manticoretechnologies.github.io/evrmore-rpc-dev/zmq/</loc>
+         <lastmod>2025-05-08</lastmod>
     </url>
 </urlset>

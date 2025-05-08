@@ -12,13 +12,9 @@
         <meta name="author" content="Manticore Technology">
       
       
-        <link rel="canonical" href="https://manticoretechnologies.github.io/evrmore-rpc-dev/api_reference/">
+        <link rel="canonical" href="https://manticoretechnologies.github.io/evrmore-rpc-dev/getting-started/">
       
       
-        <link rel="prev" href="..">
-      
-      
-        <link rel="next" href="../zmq/">
       
       
       <link rel="icon" href="../assets/favicon.png">
@@ -26,7 +22,7 @@
     
     
       
-        <title>Overview - Evrmore RPC</title>
+        <title>Getting Started with evrmore-rpc - Evrmore RPC</title>
       
     
     
@@ -82,7 +78,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#api-reference" class="md-skip">
+        <a href="#getting-started-with-evrmore-rpc" class="md-skip">
           Skip to content
         </a>
       
@@ -117,7 +113,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Overview
+              Getting Started with evrmore-rpc
             
           </span>
         </div>
@@ -288,10 +284,8 @@
       
   
   
-    
   
   
-  
     
     
       
@@ -316,11 +310,13 @@
       
     
     
-    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" checked>
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_2" >
         
           
           <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="">
@@ -336,7 +332,7 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="true">
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
           <label class="md-nav__title" for="__nav_2">
             <span class="md-nav__icon md-icon"></span>
             API Reference
@@ -347,32 +343,10 @@
                 
   
   
-    
   
   
-  
-    <li class="md-nav__item md-nav__item--active">
-      
-      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
-      
-      
-        
-      
-      
-        <label class="md-nav__link md-nav__link--active" for="__toc">
-          
-  
-  
-  <span class="md-ellipsis">
-    Overview
-    
-  </span>
-  
-
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
-      <a href="./" class="md-nav__link md-nav__link--active">
+    <li class="md-nav__item">
+      <a href="../api_reference/" class="md-nav__link">
         
   
   
@@ -383,73 +357,6 @@
   
 
       </a>
-      
-        
-
-  
-
-<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
-  
-  
-  
-    
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#overview" class="md-nav__link">
-    <span class="md-ellipsis">
-      Overview
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#main-classes" class="md-nav__link">
-    <span class="md-ellipsis">
-      🚀 Main Classes
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#quick-example" class="md-nav__link">
-    <span class="md-ellipsis">
-      🧪 Quick Example
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#design-philosophy" class="md-nav__link">
-    <span class="md-ellipsis">
-      🧠 Design Philosophy
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#explore-more" class="md-nav__link">
-    <span class="md-ellipsis">
-      🔎 Explore More
-    </span>
-  </a>
-  
-</li>
-      
-    </ul>
-  
-</nav>
-      
     </li>
   
 
@@ -662,91 +569,110 @@
   
 
 
-<h1 id="api-reference">API Reference<a class="headerlink" href="#api-reference" title="Permanent link">&para;</a></h1>
-<p>This page documents the main classes and methods of the <code>evrmore-rpc</code> Python package.</p>
-<h2 id="overview">Overview<a class="headerlink" href="#overview" title="Permanent link">&para;</a></h2>
-<p>The <code>evrmore-rpc</code> library provides a full-featured, production-grade API for interacting with the Evrmore blockchain. It supports:</p>
-<ul>
-<li><strong>Synchronous and Asynchronous Clients</strong>: Choose between <code>EvrmoreClient</code> or <code>EvrmoreAsyncRPCClient</code>.</li>
-<li><strong>ZMQ Notifications</strong>: Stream real-time block and transaction data.</li>
-<li><strong>WebSockets</strong>: Push blockchain data to clients with subscription support.</li>
-<li><strong>Typed Models</strong>: Built with Pydantic for strong typing and validation.</li>
-<li><strong>Flexible Configuration</strong>: Works out-of-the-box with <code>evrmore.conf</code>, env vars, or direct credentials.</li>
-</ul>
-<hr />
-<h2 id="main-classes">🚀 Main Classes<a class="headerlink" href="#main-classes" title="Permanent link">&para;</a></h2>
-<table>
-<thead>
-<tr>
-<th>Class</th>
-<th>Description</th>
-<th>Import Path</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><code>EvrmoreClient</code></td>
-<td>Main synchronous client</td>
-<td><code>from evrmore_rpc import EvrmoreClient</code></td>
-</tr>
-<tr>
-<td><code>EvrmoreZMQClient</code></td>
-<td>ZMQ notifications client</td>
-<td><code>from evrmore_rpc.zmq import EvrmoreZMQClient</code></td>
-</tr>
-<tr>
-<td><code>EvrmoreWebSocketClient</code></td>
-<td>WebSocket client</td>
-<td><code>from evrmore_rpc.websockets import EvrmoreWebSocketClient</code></td>
-</tr>
-<tr>
-<td><code>EvrmoreWebSocketServer</code></td>
-<td>WebSocket server</td>
-<td><code>from evrmore_rpc.websockets import EvrmoreWebSocketServer</code></td>
-</tr>
-</tbody>
-</table>
-<hr />
-<h2 id="quick-example">🧪 Quick Example<a class="headerlink" href="#quick-example" title="Permanent link">&para;</a></h2>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">evrmore_rpc</span><span class="w"> </span><span class="kn">import</span> <span class="n">EvrmoreClient</span>
-</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>
-</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="c1"># Create a client</span>
-</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="n">client</span> <span class="o">=</span> <span class="n">EvrmoreClient</span><span class="p">()</span>
-</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>
-</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="c1"># Get blockchain info</span>
-</span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="n">info</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">getblockchaininfo</span><span class="p">()</span>
-</span><span id="__span-0-8"><a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Current block height: </span><span class="si">{</span><span class="n">info</span><span class="o">.</span><span class="n">blocks</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-</span><span id="__span-0-9"><a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Chain: </span><span class="si">{</span><span class="n">info</span><span class="o">.</span><span class="n">chain</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-</span><span id="__span-0-10"><a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Difficulty: </span><span class="si">{</span><span class="n">info</span><span class="o">.</span><span class="n">difficulty</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-</span><span id="__span-0-11"><a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a>
-</span><span id="__span-0-12"><a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a><span class="c1"># Get a specific block</span>
-</span><span id="__span-0-13"><a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a><span class="n">block_hash</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">getblockhash</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
-</span><span id="__span-0-14"><a id="__codelineno-0-14" name="__codelineno-0-14" href="#__codelineno-0-14"></a><span class="n">block</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">getblock</span><span class="p">(</span><span class="n">block_hash</span><span class="p">)</span>
-</span><span id="__span-0-15"><a id="__codelineno-0-15" name="__codelineno-0-15" href="#__codelineno-0-15"></a><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Block #1 hash: </span><span class="si">{</span><span class="n">block</span><span class="o">.</span><span class="n">hash</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-</span><span id="__span-0-16"><a id="__codelineno-0-16" name="__codelineno-0-16" href="#__codelineno-0-16"></a><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Block #1 time: </span><span class="si">{</span><span class="n">block</span><span class="o">.</span><span class="n">time</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-</span><span id="__span-0-17"><a id="__codelineno-0-17" name="__codelineno-0-17" href="#__codelineno-0-17"></a><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Block #1 transactions: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">block</span><span class="o">.</span><span class="n">tx</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<h1 id="getting-started-with-evrmore-rpc">Getting Started with evrmore-rpc<a class="headerlink" href="#getting-started-with-evrmore-rpc" title="Permanent link">&para;</a></h1>
+<p>This guide will help you get started with the <code>evrmore-rpc</code> Python client for the Evrmore blockchain.</p>
+<h2 id="installation">📦 Installation<a class="headerlink" href="#installation" title="Permanent link">&para;</a></h2>
+<p>Install the package using pip:</p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>pip<span class="w"> </span>install<span class="w"> </span>evrmore-rpc
 </span></code></pre></div>
-<hr />
-<h2 id="design-philosophy">🧠 Design Philosophy<a class="headerlink" href="#design-philosophy" title="Permanent link">&para;</a></h2>
+<p>Optional extras:</p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>pip<span class="w"> </span>install<span class="w"> </span>evrmore-rpc<span class="o">[</span>websockets<span class="o">]</span><span class="w">     </span><span class="c1"># For WebSocket support</span>
+</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>pip<span class="w"> </span>install<span class="w"> </span>evrmore-rpc<span class="o">[</span>full<span class="o">]</span><span class="w">           </span><span class="c1"># All optional dependencies</span>
+</span></code></pre></div>
+<h2 id="quick-start">🚀 Quick Start<a class="headerlink" href="#quick-start" title="Permanent link">&para;</a></h2>
+<h3 id="basic-usage">Basic Usage<a class="headerlink" href="#basic-usage" title="Permanent link">&para;</a></h3>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">evrmore_rpc</span><span class="w"> </span><span class="kn">import</span> <span class="n">EvrmoreClient</span>
+</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>
+</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="c1"># Create a client (auto-loads from evrmore.conf)</span>
+</span><span id="__span-2-4"><a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="n">client</span> <span class="o">=</span> <span class="n">EvrmoreClient</span><span class="p">()</span>
+</span><span id="__span-2-5"><a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a>
+</span><span id="__span-2-6"><a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a><span class="c1"># Get blockchain info</span>
+</span><span id="__span-2-7"><a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a><span class="n">info</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">getblockchaininfo</span><span class="p">()</span>
+</span><span id="__span-2-8"><a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Current block height: </span><span class="si">{</span><span class="n">info</span><span class="p">[</span><span class="s1">&#39;blocks&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</span><span id="__span-2-9"><a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Chain: </span><span class="si">{</span><span class="n">info</span><span class="p">[</span><span class="s1">&#39;chain&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</span><span id="__span-2-10"><a id="__codelineno-2-10" name="__codelineno-2-10" href="#__codelineno-2-10"></a><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Difficulty: </span><span class="si">{</span><span class="n">info</span><span class="p">[</span><span class="s1">&#39;difficulty&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</span><span id="__span-2-11"><a id="__codelineno-2-11" name="__codelineno-2-11" href="#__codelineno-2-11"></a>
+</span><span id="__span-2-12"><a id="__codelineno-2-12" name="__codelineno-2-12" href="#__codelineno-2-12"></a><span class="c1"># Get a specific block</span>
+</span><span id="__span-2-13"><a id="__codelineno-2-13" name="__codelineno-2-13" href="#__codelineno-2-13"></a><span class="n">block_hash</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">getblockhash</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+</span><span id="__span-2-14"><a id="__codelineno-2-14" name="__codelineno-2-14" href="#__codelineno-2-14"></a><span class="n">block</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">getblock</span><span class="p">(</span><span class="n">block_hash</span><span class="p">)</span>
+</span><span id="__span-2-15"><a id="__codelineno-2-15" name="__codelineno-2-15" href="#__codelineno-2-15"></a><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Block #1 hash: </span><span class="si">{</span><span class="n">block</span><span class="o">.</span><span class="n">hash</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</span><span id="__span-2-16"><a id="__codelineno-2-16" name="__codelineno-2-16" href="#__codelineno-2-16"></a><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Block #1 time: </span><span class="si">{</span><span class="n">block</span><span class="o">.</span><span class="n">time</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</span><span id="__span-2-17"><a id="__codelineno-2-17" name="__codelineno-2-17" href="#__codelineno-2-17"></a><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Block #1 transactions: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">block</span><span class="o">.</span><span class="n">tx</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</span></code></pre></div>
+<h3 id="asynchronous-usage">Asynchronous Usage<a class="headerlink" href="#asynchronous-usage" title="Permanent link">&para;</a></h3>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="kn">import</span><span class="w"> </span><span class="nn">asyncio</span>
+</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="kn">from</span><span class="w"> </span><span class="nn">evrmore_rpc</span><span class="w"> </span><span class="kn">import</span> <span class="n">EvrmoreClient</span>
+</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>
+</span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">():</span>
+</span><span id="__span-3-5"><a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a>    <span class="c1"># Create client</span>
+</span><span id="__span-3-6"><a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a>    <span class="n">client</span> <span class="o">=</span> <span class="n">EvrmoreClient</span><span class="p">()</span>
+</span><span id="__span-3-7"><a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a>
+</span><span id="__span-3-8"><a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a>    <span class="c1"># Get blockchain info</span>
+</span><span id="__span-3-9"><a id="__codelineno-3-9" name="__codelineno-3-9" href="#__codelineno-3-9"></a>    <span class="n">info</span> <span class="o">=</span> <span class="k">await</span> <span class="n">client</span><span class="o">.</span><span class="n">getblockchaininfo</span><span class="p">()</span>
+</span><span id="__span-3-10"><a id="__codelineno-3-10" name="__codelineno-3-10" href="#__codelineno-3-10"></a>    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Current block height: </span><span class="si">{</span><span class="n">info</span><span class="p">[</span><span class="s1">&#39;blocks&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</span><span id="__span-3-11"><a id="__codelineno-3-11" name="__codelineno-3-11" href="#__codelineno-3-11"></a>
+</span><span id="__span-3-12"><a id="__codelineno-3-12" name="__codelineno-3-12" href="#__codelineno-3-12"></a>    <span class="c1"># Get a block</span>
+</span><span id="__span-3-13"><a id="__codelineno-3-13" name="__codelineno-3-13" href="#__codelineno-3-13"></a>    <span class="n">block_hash</span> <span class="o">=</span> <span class="k">await</span> <span class="n">client</span><span class="o">.</span><span class="n">getblockhash</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+</span><span id="__span-3-14"><a id="__codelineno-3-14" name="__codelineno-3-14" href="#__codelineno-3-14"></a>    <span class="n">block</span> <span class="o">=</span> <span class="k">await</span> <span class="n">client</span><span class="o">.</span><span class="n">getblock</span><span class="p">(</span><span class="n">block_hash</span><span class="p">)</span>
+</span><span id="__span-3-15"><a id="__codelineno-3-15" name="__codelineno-3-15" href="#__codelineno-3-15"></a>    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Block #1 hash: </span><span class="si">{</span><span class="n">block</span><span class="o">.</span><span class="n">hash</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</span><span id="__span-3-16"><a id="__codelineno-3-16" name="__codelineno-3-16" href="#__codelineno-3-16"></a>
+</span><span id="__span-3-17"><a id="__codelineno-3-17" name="__codelineno-3-17" href="#__codelineno-3-17"></a>    <span class="c1"># Close the client</span>
+</span><span id="__span-3-18"><a id="__codelineno-3-18" name="__codelineno-3-18" href="#__codelineno-3-18"></a>    <span class="k">await</span> <span class="n">client</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+</span><span id="__span-3-19"><a id="__codelineno-3-19" name="__codelineno-3-19" href="#__codelineno-3-19"></a>
+</span><span id="__span-3-20"><a id="__codelineno-3-20" name="__codelineno-3-20" href="#__codelineno-3-20"></a><span class="c1"># Run the async code</span>
+</span><span id="__span-3-21"><a id="__codelineno-3-21" name="__codelineno-3-21" href="#__codelineno-3-21"></a><span class="n">asyncio</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">main</span><span class="p">())</span>
+</span></code></pre></div>
+<h2 id="configuration">⚙️ Configuration<a class="headerlink" href="#configuration" title="Permanent link">&para;</a></h2>
+<p>The client can be configured in several ways:</p>
+<h3 id="1-using-evrmoreconf">1. Using evrmore.conf<a class="headerlink" href="#1-using-evrmoreconf" title="Permanent link">&para;</a></h3>
+<p>By default, the client will look for <code>evrmore.conf</code> in the default Evrmore data directory:</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="n">client</span> <span class="o">=</span> <span class="n">EvrmoreClient</span><span class="p">()</span>  <span class="c1"># Auto-loads from evrmore.conf</span>
+</span></code></pre></div>
+<h3 id="2-environment-variables">2. Environment Variables<a class="headerlink" href="#2-environment-variables" title="Permanent link">&para;</a></h3>
+<p>Set these environment variables to configure the client:</p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="nv">EVR_RPC_URL</span><span class="o">=</span>http://localhost:8819
+</span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="nv">EVR_RPC_USER</span><span class="o">=</span>user
+</span><span id="__span-5-3"><a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="nv">EVR_RPC_PASSWORD</span><span class="o">=</span>pass
+</span><span id="__span-5-4"><a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a><span class="nv">EVR_RPC_PORT</span><span class="o">=</span><span class="m">8819</span>
+</span><span id="__span-5-5"><a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a><span class="nv">EVR_TESTNET</span><span class="o">=</span><span class="nb">true</span>
+</span></code></pre></div>
+<p>Then create the client:</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="n">client</span> <span class="o">=</span> <span class="n">EvrmoreClient</span><span class="p">()</span>  <span class="c1"># Auto-loads from environment</span>
+</span></code></pre></div>
+<h3 id="3-manual-configuration">3. Manual Configuration<a class="headerlink" href="#3-manual-configuration" title="Permanent link">&para;</a></h3>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="n">client</span> <span class="o">=</span> <span class="n">EvrmoreClient</span><span class="p">(</span>
+</span><span id="__span-7-2"><a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a>    <span class="n">url</span><span class="o">=</span><span class="s2">&quot;http://localhost:8819&quot;</span><span class="p">,</span>
+</span><span id="__span-7-3"><a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a>    <span class="n">rpcuser</span><span class="o">=</span><span class="s2">&quot;user&quot;</span><span class="p">,</span>
+</span><span id="__span-7-4"><a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a>    <span class="n">rpcpassword</span><span class="o">=</span><span class="s2">&quot;pass&quot;</span><span class="p">,</span>
+</span><span id="__span-7-5"><a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a>    <span class="n">rpcport</span><span class="o">=</span><span class="mi">8819</span><span class="p">,</span>
+</span><span id="__span-7-6"><a id="__codelineno-7-6" name="__codelineno-7-6" href="#__codelineno-7-6"></a>    <span class="n">testnet</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+</span><span id="__span-7-7"><a id="__codelineno-7-7" name="__codelineno-7-7" href="#__codelineno-7-7"></a>    <span class="n">timeout</span><span class="o">=</span><span class="mi">30</span><span class="p">,</span>
+</span><span id="__span-7-8"><a id="__codelineno-7-8" name="__codelineno-7-8" href="#__codelineno-7-8"></a>    <span class="n">async_mode</span><span class="o">=</span><span class="kc">None</span>  <span class="c1"># Auto-detect or force sync/async</span>
+</span><span id="__span-7-9"><a id="__codelineno-7-9" name="__codelineno-7-9" href="#__codelineno-7-9"></a><span class="p">)</span>
+</span></code></pre></div>
+<h3 id="4-cookie-authentication">4. Cookie Authentication<a class="headerlink" href="#4-cookie-authentication" title="Permanent link">&para;</a></h3>
+<p>The client can automatically read from the <code>.cookie</code> file:</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="n">client</span> <span class="o">=</span> <span class="n">EvrmoreClient</span><span class="p">(</span><span class="n">datadir</span><span class="o">=</span><span class="s2">&quot;~/.evrmore&quot;</span><span class="p">)</span>
+</span></code></pre></div>
+<h2 id="asset-support">💰 Asset Support<a class="headerlink" href="#asset-support" title="Permanent link">&para;</a></h2>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="c1"># Get asset info</span>
+</span><span id="__span-9-2"><a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a><span class="n">info</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">getassetdata</span><span class="p">(</span><span class="s2">&quot;MYTOKEN&quot;</span><span class="p">)</span>
+</span><span id="__span-9-3"><a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Amount: </span><span class="si">{</span><span class="n">info</span><span class="p">[</span><span class="s1">&#39;amount&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</span><span id="__span-9-4"><a id="__codelineno-9-4" name="__codelineno-9-4" href="#__codelineno-9-4"></a><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Reissuable: </span><span class="si">{</span><span class="n">info</span><span class="p">[</span><span class="s1">&#39;reissuable&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</span><span id="__span-9-5"><a id="__codelineno-9-5" name="__codelineno-9-5" href="#__codelineno-9-5"></a>
+</span><span id="__span-9-6"><a id="__codelineno-9-6" name="__codelineno-9-6" href="#__codelineno-9-6"></a><span class="c1"># Transfer asset</span>
+</span><span id="__span-9-7"><a id="__codelineno-9-7" name="__codelineno-9-7" href="#__codelineno-9-7"></a><span class="n">txid</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">transfer</span><span class="p">(</span><span class="s2">&quot;MYTOKEN&quot;</span><span class="p">,</span> <span class="mi">100</span><span class="p">,</span> <span class="s2">&quot;EVRAddress&quot;</span><span class="p">)</span>
+</span><span id="__span-9-8"><a id="__codelineno-9-8" name="__codelineno-9-8" href="#__codelineno-9-8"></a><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Transfer txid: </span><span class="si">{</span><span class="n">txid</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</span></code></pre></div>
+<h2 id="real-time-notifications">📡 Real-Time Notifications<a class="headerlink" href="#real-time-notifications" title="Permanent link">&para;</a></h2>
+<p>For real-time blockchain notifications, see the <a href="../zmq/">ZMQ Guide</a> and <a href="../websockets/">WebSocket Guide</a>.</p>
+<h2 id="next-steps">🔍 Next Steps<a class="headerlink" href="#next-steps" title="Permanent link">&para;</a></h2>
 <ul>
-<li>✅ <strong>Type Safety</strong>: All methods return validated, documented models using Pydantic.</li>
-<li>🔁 <strong>Context Awareness</strong>: Clients auto-adapt to sync/async environments.</li>
-<li>⚡ <strong>Performance First</strong>: Fast connection pooling, minimal overhead.</li>
-<li>🔐 <strong>Secure Defaults</strong>: Supports <code>.cookie</code> auth, encrypted RPC, and env-based credentials.</li>
-<li>🧩 <strong>Composable</strong>: All classes and utilities are modular and extendable.</li>
+<li>Check out the <a href="../api-reference/">API Reference</a> for detailed method documentation</li>
+<li>Explore <a href="../examples/">Examples</a> for more usage patterns</li>
+<li>Read <a href="../advanced/">Advanced Usage</a> for production best practices</li>
+<li>Learn about <a href="../development/">Development</a> if you want to contribute </li>
 </ul>
-<hr />
-<h2 id="explore-more">🔎 Explore More<a class="headerlink" href="#explore-more" title="Permanent link">&para;</a></h2>
-<ul>
-<li><a href="sync_api.md">Synchronous API</a>: Traditional blocking usage via <code>EvrmoreClient</code></li>
-<li><a href="async_api.md">Asynchronous API</a>: Async/await programming via <code>EvrmoreAsyncRPCClient</code></li>
-<li><a href="../zmq/">ZMQ Support</a>: Realtime blockchain streaming with <code>EvrmoreZMQClient</code></li>
-<li><a href="../websockets/">WebSockets Support</a>: Pub-sub architecture using <code>EvrmoreWebSocketServer</code></li>
-<li><a href="../models/">Data Models</a>: Full list of typed structures returned from RPC</li>
-<li><a href="../examples/">Usage Examples</a>: Dashboards, stress tests, DEX logic, more</li>
-</ul>
-<hr />
-<p>For additional CLI usage, performance benchmarks, and integrations, check the <a href="../">README</a> and the <code>examples/</code> directory.</p>
 
 
 
@@ -771,44 +697,6 @@
       
         <footer class="md-footer">
   
-    
-      
-      <nav class="md-footer__inner md-grid" aria-label="Footer" >
-        
-          
-          <a href=".." class="md-footer__link md-footer__link--prev" aria-label="Previous: Home">
-            <div class="md-footer__button md-icon">
-              
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
-            </div>
-            <div class="md-footer__title">
-              <span class="md-footer__direction">
-                Previous
-              </span>
-              <div class="md-ellipsis">
-                Home
-              </div>
-            </div>
-          </a>
-        
-        
-          
-          <a href="../zmq/" class="md-footer__link md-footer__link--next" aria-label="Next: ZMQ Support">
-            <div class="md-footer__title">
-              <span class="md-footer__direction">
-                Next
-              </span>
-              <div class="md-ellipsis">
-                ZMQ Support
-              </div>
-            </div>
-            <div class="md-footer__button md-icon">
-              
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11z"/></svg>
-            </div>
-          </a>
-        
-      </nav>
     
   
   <div class="md-footer-meta md-typeset">

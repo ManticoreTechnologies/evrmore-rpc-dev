@@ -1,379 +1,416 @@
-# ZMQ Support
+# evrmore-rpc: Python Client for Evrmore Blockchain
 
-The `evrmore-rpc` package provides ZMQ (ZeroMQ) support for receiving real-time notifications from the Evrmore blockchain. This allows you to build applications that can react to new blocks, transactions, and other blockchain events as they happen.
+[![PyPI version](https://badge.fury.io/py/evrmore-rpc.svg)](https://badge.fury.io/py/evrmore-rpc)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Python Versions](https://img.shields.io/pypi/pyversions/evrmore-rpc.svg)](https://pypi.org/project/evrmore-rpc/)
 
-## Installation
+A high-performance, fully featured Python client for the [Evrmore](https://evrmore.com) blockchain. Designed for both synchronous and asynchronous environments, it includes full RPC and ZMQ support, automatic decoding of blocks and transactions, intelligent asset detection, and robust configuration options.
+
+---
+
+## 🚀 Features
+
+- **🔄 Context-Aware**: Automatically switches between sync and async modes
+- **⚙️ Flexible Configuration**: Load settings from `evrmore.conf`, env vars, or manual args
+- **💡 Smart RPC Handling**: Full method coverage with type hints and structured responses
+- **⚡ Fast + Efficient**: Connection pooling for low-latency concurrent RPC calls
+- **🧠 Asset Intelligence**: Auto-parses asset transactions with enhanced metadata
+- **📡 ZMQ Notifications**: Real-time support for BLOCK, TX, HASH_*, RAW_*, and asset events
+- **🧰 Fully Tested Utilities**: Includes stress test, coverage audit, pooling demo, and more
+
+---
+
+## 📦 Installation
 
 ```bash
 pip install evrmore-rpc
 ```
 
-## Evrmore Node Configuration
+---
 
-To use ZMQ with Evrmore, you need to configure your Evrmore node to publish ZMQ notifications. Add the following to your `evrmore.conf` file:
+## 🧪 Quick Start
 
+```python
+from evrmore_rpc import EvrmoreClient
+
+client = EvrmoreClient()
+info = client.getblockchaininfo()
+print("Height:", info['blocks'])
+print("Difficulty:", info['difficulty'])
 ```
-# ZMQ notifications
-zmqpubhashtx=tcp://127.0.0.1:28332
+
+## 🔁 Asynchronous Usage
+
+```python
+import asyncio
+from evrmore_rpc import EvrmoreClient
+
+async def main():
+    client = EvrmoreClient()
+    info = await client.getblockchaininfo()
+    print("Height:", info['blocks'])
+    await client.close()
+
+asyncio.run(main())
+```
+
+---
+
+## 🧩 Configuration Options
+
+```python
+# Default (evrmore.conf)
+client = EvrmoreClient()
+
+# Env vars (EVR_RPC_*)
+client = EvrmoreClient()
+
+# Manual args
+client = EvrmoreClient(url="http://localhost:8819", rpcuser="user", rpcpassword="pass")
+
+# Testnet toggle
+client = EvrmoreClient(testnet=True)
+```
+
+Supports cookie authentication and auto-parsing of `.cookie` file.
+
+---
+
+## 💰 Asset Support
+
+```python
+# Get asset info
+info = client.getassetdata("MYTOKEN")
+print(info['amount'], info['reissuable'])
+
+# Transfer asset
+txid = client.transfer("MYTOKEN", 100, "EVRAddress")
+```
+
+---
+
+## 📡 ZMQ Notifications (Real-Time)
+
+# ZMQ Notifications Guide
+
+This guide covers how to use ZeroMQ (ZMQ) notifications with the `evrmore-rpc` package to receive real-time blockchain updates.
+
+## Overview
+
+The `EvrmoreZMQClient` provides a seamless interface for receiving real-time blockchain notifications via ZeroMQ. It supports:
+
+- Automatic context detection (sync/async)
+- Enhanced asset metadata in decoded transactions
+- Automatic reconnection on connection loss
+- Clean shutdown and resource management
+- Typed notification data with structured fields
+
+## Configuration
+
+### Required evrmore.conf Settings
+
+Add these lines to your `evrmore.conf`:
+
+```ini
 zmqpubhashblock=tcp://127.0.0.1:28332
-zmqpubrawtx=tcp://127.0.0.1:28332
+zmqpubhashtx=tcp://127.0.0.1:28332
 zmqpubrawblock=tcp://127.0.0.1:28332
-zmqpubsequence=tcp://127.0.0.1:28332
+zmqpubrawtx=tcp://127.0.0.1:28332
 ```
 
-Then restart your Evrmore node for the changes to take effect.
+### Client Setup
 
-## EvrmoreZMQClient
+```python
+from evrmore_rpc import EvrmoreClient
+from evrmore_rpc.zmq import EvrmoreZMQClient, ZMQTopic
 
-The `EvrmoreZMQClient` class provides a simple interface for receiving ZMQ notifications from an Evrmore node.
+# Create RPC client for auto-decoding
+rpc = EvrmoreClient()
 
-### Basic Usage
+# Create ZMQ client
+zmq = EvrmoreZMQClient(
+    zmq_host="127.0.0.1",
+    zmq_port=28332,
+    topics=[ZMQTopic.BLOCK, ZMQTopic.TX],
+    rpc_client=rpc,
+    auto_decode=True
+)
+```
+
+## Available Topics
+
+| Topic | Description | Requires RPC |
+|-------|-------------|-------------|
+| `HASH_BLOCK` | Block hash notifications | No |
+| `HASH_TX` | Transaction hash notifications | No |
+| `RAW_BLOCK` | Raw serialized block data | No |
+| `RAW_TX` | Raw serialized transaction data | No |
+| `BLOCK` | Auto-decoded block data | Yes |
+| `TX` | Auto-decoded transaction data | Yes |
+
+## Event Handlers
+
+### Block Notifications
+
+```python
+@zmq.on(ZMQTopic.BLOCK)
+def handle_block(notification):
+    print(f"Block #{notification.height}")
+    print(f"Hash: {notification.hex}")
+    print(f"Transactions: {len(notification.block['tx'])}")
+    
+    # Access block data
+    block = notification.block
+    print(f"Size: {block.get('size', 'N/A')} bytes")
+    print(f"Time: {block.get('time', 'N/A')}")
+    print(f"Difficulty: {block.get('difficulty', 'N/A')}")
+```
+
+### Transaction Notifications
+
+```python
+@zmq.on(ZMQTopic.TX)
+def handle_tx(notification):
+    print(f"TX {notification.tx['txid']}")
+    print(f"Size: {notification.tx.get('size', 'N/A')} bytes")
+    print(f"Version: {notification.tx.get('version', 'N/A')}")
+    
+    # Check for asset data
+    if notification.has_assets:
+        print("\nAsset Information:")
+        for asset in notification.asset_info:
+            print(f"Asset: {asset.get('name', 'N/A')}")
+            print(f"Amount: {asset.get('amount', 'N/A')}")
+            print(f"Type: {asset.get('type', 'N/A')}")
+```
+
+## Usage Examples
+
+### Synchronous Usage
+
+```python
+import signal
+import sys
+from evrmore_rpc.zmq import EvrmoreZMQClient, ZMQTopic
+
+# Initialize client
+zmq = EvrmoreZMQClient()
+zmq.set_lingering(0)  # For fast shutdown
+
+# Handle Ctrl+C
+def signal_handler(sig, frame):
+    print("\nShutting down...")
+    zmq.stop()
+    sys.exit(0)
+
+signal.signal(signal.SIGINT, signal_handler)
+
+# Register handlers
+@zmq.on(ZMQTopic.BLOCK)
+def handle_block(notification):
+    print(f"Block #{notification.height}")
+
+@zmq.on(ZMQTopic.TX)
+def handle_tx(notification):
+    print(f"TX {notification.tx['txid']}")
+
+# Start the client
+zmq.start()
+
+# Keep running
+while True:
+    import time
+    time.sleep(1)
+```
+
+### Asynchronous Usage
 
 ```python
 import asyncio
 from evrmore_rpc.zmq import EvrmoreZMQClient, ZMQTopic
 
-async def handle_block(notification):
-    print(f"New block: {notification.hex}")
-
-async def handle_transaction(notification):
-    print(f"New transaction: {notification.hex}")
-
 async def main():
-    # Create a ZMQ client
-    client = EvrmoreZMQClient(
-        address="tcp://127.0.0.1:28332",
-        topics=[ZMQTopic.HASH_BLOCK, ZMQTopic.HASH_TX]
-    )
-    
+    # Initialize client
+    zmq = EvrmoreZMQClient()
+    zmq.set_lingering(0)
+
     # Register handlers
-    client.on_block(handle_block)
-    client.on_transaction(handle_transaction)
-    
-    # Start the client
-    await client.start()
-    
-    # Keep running until interrupted
-    try:
-        while True:
-            await asyncio.sleep(1)
-    finally:
-        await client.stop()
-
-if __name__ == "__main__":
-    asyncio.run(main())
-```
-
-### Initialization
-
-```python
-from evrmore_rpc.zmq import EvrmoreZMQClient, ZMQTopic
-
-# Create a client with default settings (localhost:28332)
-client = EvrmoreZMQClient()
-
-# Create a client with custom settings
-client = EvrmoreZMQClient(
-    address="tcp://127.0.0.1:28332",
-    topics=[ZMQTopic.HASH_BLOCK, ZMQTopic.HASH_TX, ZMQTopic.RAW_BLOCK, ZMQTopic.RAW_TX, ZMQTopic.SEQUENCE]
-)
-
-# Create a client with a custom ZMQ context
-import zmq.asyncio
-context = zmq.asyncio.Context()
-client = EvrmoreZMQClient(
-    address="tcp://127.0.0.1:28332",
-    context=context
-)
-```
-
-### Parameters
-
-- `address` (str): The ZMQ endpoint address (default: "tcp://127.0.0.1:28332")
-- `context` (Optional[zmq.asyncio.Context]): A custom ZMQ context (default: None)
-- `topics` (List[ZMQTopic]): The topics to subscribe to (default: all topics)
-
-### ZMQTopic Enum
-
-The `ZMQTopic` enum defines the available ZMQ notification topics:
-
-- `HASH_TX`: Transaction hash notifications
-- `HASH_BLOCK`: Block hash notifications
-- `RAW_TX`: Raw transaction notifications
-- `RAW_BLOCK`: Raw block notifications
-- `SEQUENCE`: Sequence notifications
-
-### Registering Handlers
-
-You can register handlers for specific notification types using the following decorators:
-
-```python
-from evrmore_rpc.zmq import EvrmoreZMQClient
-
-client = EvrmoreZMQClient()
-
-@client.on_block
-async def handle_block(notification):
-    print(f"New block: {notification.hex}")
-
-@client.on_transaction
-async def handle_transaction(notification):
-    print(f"New transaction: {notification.hex}")
-
-@client.on_raw_block
-async def handle_raw_block(notification):
-    print(f"New raw block: {len(notification.body)} bytes")
-
-@client.on_raw_transaction
-async def handle_raw_transaction(notification):
-    print(f"New raw transaction: {len(notification.body)} bytes")
-
-@client.on_sequence
-async def handle_sequence(notification):
-    print(f"New sequence: {notification.hex}")
-```
-
-Alternatively, you can register handlers using the method syntax:
-
-```python
-async def handle_block(notification):
-    print(f"New block: {notification.hex}")
-
-async def handle_transaction(notification):
-    print(f"New transaction: {notification.hex}")
-
-client.on_block(handle_block)
-client.on_transaction(handle_transaction)
-```
-
-### ZMQNotification Object
-
-The `ZMQNotification` object passed to handlers has the following properties:
-
-- `topic` (ZMQTopic): The notification topic
-- `body` (bytes): The notification body (raw data)
-- `sequence` (Optional[int]): The notification sequence number (if available)
-- `hex` (str): The notification body as a hexadecimal string
-
-### Starting and Stopping
-
-The `EvrmoreZMQClient` class provides methods for starting and stopping the client:
-
-```python
-import asyncio
-from evrmore_rpc.zmq import EvrmoreZMQClient
-
-async def main():
-    client = EvrmoreZMQClient()
-    
-    # Register handlers
-    # ...
-    
-    # Start the client
-    await client.start()
-    
-    # Keep running for a while
-    await asyncio.sleep(60)
-    
-    # Stop the client
-    await client.stop()
-
-asyncio.run(main())
-```
-
-### Async Context Manager
-
-The `EvrmoreZMQClient` class supports the async context manager protocol, which ensures proper cleanup of resources:
-
-```python
-import asyncio
-from evrmore_rpc.zmq import EvrmoreZMQClient
-
-async def main():
-    async with EvrmoreZMQClient() as client:
-        # Register handlers
-        @client.on_block
-        async def handle_block(notification):
-            print(f"New block: {notification.hex}")
-        
-        # Keep running for a while
-        await asyncio.sleep(60)
-
-asyncio.run(main())
-```
-
-## Advanced Usage
-
-### Custom ZMQ Context
-
-You can provide a custom ZMQ context to the `EvrmoreZMQClient` constructor:
-
-```python
-import zmq.asyncio
-from evrmore_rpc.zmq import EvrmoreZMQClient
-
-# Create a custom ZMQ context
-context = zmq.asyncio.Context()
-
-# Create a ZMQ client with the custom context
-client = EvrmoreZMQClient(
-    address="tcp://127.0.0.1:28332",
-    context=context
-)
-```
-
-### Multiple Handlers
-
-You can register multiple handlers for the same notification type:
-
-```python
-from evrmore_rpc.zmq import EvrmoreZMQClient
-
-client = EvrmoreZMQClient()
-
-@client.on_block
-async def log_block(notification):
-    print(f"New block: {notification.hex}")
-
-@client.on_block
-async def save_block(notification):
-    # Save the block to a database
-    pass
-
-@client.on_block
-async def notify_users(notification):
-    # Notify users about the new block
-    pass
-```
-
-### Error Handling
-
-Handlers can raise exceptions, which will be caught and logged by the `EvrmoreZMQClient`:
-
-```python
-from evrmore_rpc.zmq import EvrmoreZMQClient
-
-client = EvrmoreZMQClient()
-
-@client.on_block
-async def handle_block(notification):
-    # This will raise an exception
-    raise ValueError("Something went wrong")
-```
-
-### Integration with WebSockets
-
-The `EvrmoreZMQClient` can be integrated with WebSockets to broadcast blockchain events to web clients:
-
-```python
-import asyncio
-import websockets
-import json
-from evrmore_rpc.zmq import EvrmoreZMQClient
-
-# Connected WebSocket clients
-clients = set()
-
-async def register(websocket):
-    clients.add(websocket)
-    try:
-        await websocket.wait_closed()
-    finally:
-        clients.remove(websocket)
-
-async def broadcast(message):
-    if clients:
-        await asyncio.gather(
-            *[client.send(message) for client in clients]
-        )
-
-async def zmq_handler():
-    client = EvrmoreZMQClient()
-    
-    @client.on_block
+    @zmq.on(ZMQTopic.BLOCK)
     async def handle_block(notification):
-        message = json.dumps({
-            "type": "block",
-            "hash": notification.hex
-        })
-        await broadcast(message)
-    
-    @client.on_transaction
-    async def handle_transaction(notification):
-        message = json.dumps({
-            "type": "transaction",
-            "hash": notification.hex
-        })
-        await broadcast(message)
-    
-    await client.start()
+        print(f"Block #{notification.height}")
+
+    @zmq.on(ZMQTopic.TX)
+    async def handle_tx(notification):
+        print(f"TX {notification.tx['txid']}")
+
+    # Start the client
+    await zmq.start()
     
     try:
+        # Keep running
         while True:
             await asyncio.sleep(1)
+    except KeyboardInterrupt:
+        print("\nShutting down...")
     finally:
-        await client.stop()
-
-async def websocket_server(websocket, path):
-    await register(websocket)
-
-async def main():
-    # Start ZMQ handler
-    asyncio.create_task(zmq_handler())
-    
-    # Start WebSocket server
-    async with websockets.serve(websocket_server, "localhost", 8765):
-        await asyncio.Future()  # Run forever
+        await zmq.stop()
 
 asyncio.run(main())
 ```
 
-## ZMQ Utilities
+## Advanced Features
 
-The `evrmore_rpc.zmq.utils` module provides utility functions for working with ZMQ notifications:
-
-### Transaction Utilities
+### Custom Message Processing
 
 ```python
-from evrmore_rpc.zmq.utils import (
-    get_transaction_hash,
-    get_transaction_inputs,
-    get_transaction_outputs,
-    parse_transaction
-)
-
-# Get transaction hash from raw transaction
-tx_hash = get_transaction_hash(raw_tx_bytes)
-
-# Get transaction inputs from raw transaction
-inputs = get_transaction_inputs(raw_tx_bytes)
-
-# Get transaction outputs from raw transaction
-outputs = get_transaction_outputs(raw_tx_bytes)
-
-# Parse raw transaction into a structured object
-tx = parse_transaction(raw_tx_bytes)
+class BlockchainMonitor:
+    def __init__(self):
+        self.zmq_client = EvrmoreZMQClient()
+        self.rpc_client = EvrmoreClient()
+        self.blocks_processed = 0
+        self.transactions_processed = 0
+        self.asset_transfers = []
+        
+    async def start(self):
+        # Register handlers
+        self.zmq_client.on_block(self.handle_block)
+        self.zmq_client.on_transaction(self.handle_transaction)
+        
+        # Start the ZMQ client
+        await self.zmq_client.start()
+        print("Blockchain monitor started")
+        
+    async def stop(self):
+        await self.zmq_client.stop()
+        print("Blockchain monitor stopped")
+        
+    async def handle_block(self, notification):
+        block_hash = notification.hex
+        block = self.rpc_client.getblock(block_hash)
+        
+        self.blocks_processed += 1
+        print(f"New block: {block.hash} (height: {block.height})")
+        print(f"Block contains {len(block.tx)} transactions")
+        
+        # Analyze block data
+        if len(block.tx) > 100:
+            print(f"Large block detected: {len(block.tx)} transactions")
+        
+    async def handle_transaction(self, notification):
+        txid = notification.hex
+        
+        try:
+            tx = self.rpc_client.getrawtransaction(txid, True)
+            self.transactions_processed += 1
+            
+            # Check for asset transfers
+            for vout in tx.vout:
+                if "asset" in vout.get("scriptPubKey", {}).get("asset", {}):
+                    asset = vout["scriptPubKey"]["asset"]
+                    print(f"Asset transfer detected: {asset['name']} ({asset['amount']})")
+                    
+                    self.asset_transfers.append({
+                        "txid": txid,
+                        "asset": asset["name"],
+                        "amount": asset["amount"],
+                        "time": tx.time if hasattr(tx, "time") else None
+                    })
+        except Exception as e:
+            print(f"Error processing transaction {txid}: {e}")
 ```
 
-### Block Utilities
+## Error Handling
 
 ```python
-from evrmore_rpc.zmq.utils import (
-    get_block_hash,
-    get_block_header,
-    get_block_transactions,
-    parse_block
-)
+from evrmore_rpc.zmq import EvrmoreZMQError
 
-# Get block hash from raw block
-block_hash = get_block_hash(raw_block_bytes)
+try:
+    zmq.start()
+except EvrmoreZMQError as e:
+    print(f"ZMQ error: {e}")
+except Exception as e:
+    print(f"Unexpected error: {e}")
+```
 
-# Get block header from raw block
-header = get_block_header(raw_block_bytes)
+## Performance Considerations
 
-# Get block transactions from raw block
-transactions = get_block_transactions(raw_block_bytes)
+- Use `set_lingering(0)` for fast shutdown
+- Set appropriate cleanup timeouts
+- Consider using async mode for better performance
+- Monitor memory usage with large transaction volumes
 
-# Parse raw block into a structured object
-block = parse_block(raw_block_bytes)
-``` 
+## See Also
+
+- [Getting Started](getting-started.md) for basic usage
+- [API Reference](api-reference.md) for detailed API docs
+- [Examples](examples.md) for more code samples
+- [Advanced Usage](advanced.md) for production patterns
+
+---
+
+## 📊 Stress Test Results
+
+Real benchmark results from the `stress_test.py` utility:
+
+| Mode            | Time    | RPS      | Avg (ms) | Median | Min  | Max  |
+|-----------------|---------|----------|----------|--------|------|------|
+| Local Async     | 0.01 s  | 10442.42 | 0.59     | 0.50   | 0.39 | 1.84 |
+| Local Sync      | 0.06 s  | 1861.26  | 1.52     | 1.42   | 0.43 | 3.40 |
+| Remote Async    | 1.75 s  | 57.31    | 167.77   | 155.93 | 111  | 324  |
+| Remote Sync     | 1.86 s  | 53.83    | 160.39   | 163.26 | 112  | 310  |
+
+Tested with `getblockcount`, 100 requests, 10 concurrent workers
+
+---
+
+## 🧬 Utilities & Examples
+
+```bash
+python3 -m evrmore_rpc.stress_test --sync --remote
+```
+
+Examples:
+- `readme_test.py` — basic usage demo
+- `stress_test.py` — concurrency performance test
+- `connection_pooling.py` — show pooled reuse efficiency
+- `flexible_config.py` — env var / conf / manual setup demo
+- `rpc_coverage.py` — validates full RPC method mapping
+- `zmq_notifications.py` — real-time block/tx decode stream
+
+---
+
+## 🧪 Requirements
+
+- Python 3.8+
+- Evrmore daemon running with RPC and optional ZMQ endpoints
+
+---
+
+## 🪪 License
+
+MIT License — See [LICENSE](LICENSE)
+
+---
+
+## 🤝 Contributing
+
+PRs welcome! Please lint, document, and include examples.
+
+```bash
+git clone https://github.com/manticoretechnologies/evrmore-rpc-dev
+cd evrmore-rpc
+python3 -m venv .venv && source .venv/bin/activate
+pip install -e .[dev]
+```
+
+Run tests with:
+
+```bash
+python3 -m evrmore_rpc.stress_test
+```
+
+---
+
+## 🧭 Summary
+
+`evrmore-rpc` is more than a wrapper — it's a full dev toolkit for Evrmore. Built for production-grade systems needing precision, flexibility, and real-time awareness. Perfect for explorers, exchanges, indexers, and power users.

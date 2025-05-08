@@ -1,748 +1,430 @@
-# WebSockets Support
+# evrmore-rpc: Python Client for Evrmore Blockchain
 
-The `evrmore-rpc` package provides WebSockets support for real-time communication with clients. This allows you to build applications that can push blockchain events to web clients as they happen.
+[![PyPI version](https://badge.fury.io/py/evrmore-rpc.svg)](https://badge.fury.io/py/evrmore-rpc)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Python Versions](https://img.shields.io/pypi/pyversions/evrmore-rpc.svg)](https://pypi.org/project/evrmore-rpc/)
 
-## Installation
+A high-performance, full-featured Python client for the [Evrmore](https://evrmore.com) blockchain. Designed for real-world applications like wallets, explorers, and exchanges, it includes synchronous and asynchronous RPC support, auto-decoding ZMQ streams, rich asset tracking, and powerful dev tools.
+
+---
+
+## 🚀 Features
+
+- **🔄 Context-Aware**: Auto-adapts between sync and async execution
+- **⚙️ Flexible Config**: Load from `evrmore.conf`, environment, or args
+- **🔐 Cookie & Auth**: Supports `.cookie` file and manual RPC credentials
+- **💡 Complete RPC Coverage**: All RPC methods typed and structured
+- **⚡ Connection Pooling**: Blazing fast requests with reuse support
+- **🧠 Asset Intelligence**: Detects and decodes asset transactions with extras
+- **📡 ZMQ Real-Time Streams**: Receive HASH_*, RAW_*, BLOCK, TX
+- **🧪 Fully Tested Tools**: Built-in stress test, coverage audit, flexible demos
+
+---
+
+## 📦 Installation
 
 ```bash
 pip install evrmore-rpc
 ```
 
-## WebSocket Server
+---
 
-The `EvrmoreWebSocketServer` class provides a WebSocket server that can broadcast blockchain events to connected clients.
+## 🧪 Quick Start
 
-### Basic Usage
+```python
+from evrmore_rpc import EvrmoreClient
+
+client = EvrmoreClient()
+info = client.getblockchaininfo()
+print("Height:", info['blocks'])
+```
+
+## 🔁 Async Usage
 
 ```python
 import asyncio
-from evrmore_rpc import EvrmoreRPCClient
-from evrmore_rpc.zmq import EvrmoreZMQClient
-from evrmore_rpc.websockets import EvrmoreWebSocketServer
+from evrmore_rpc import EvrmoreClient
 
 async def main():
-    # Create RPC client
-    rpc_client = EvrmoreRPCClient()
+    client = EvrmoreClient()
+    info = await client.getblockchaininfo()
+    print("Height:", info['blocks'])
+    await client.close()
+
+asyncio.run(main())
+```
+
+---
+
+## 🔧 Configuration Examples
+
+```python
+# From evrmore.conf
+client = EvrmoreClient()
+
+# From env vars (EVR_RPC_*)
+client = EvrmoreClient()
+
+# Manual override
+client = EvrmoreClient(url="http://localhost:8819", rpcuser="user", rpcpassword="pass")
+
+# Testnet flag
+client = EvrmoreClient(testnet=True)
+```
+
+---
+
+## 💰 Asset Support
+
+```python
+info = client.getassetdata("INFERNA")
+print(info['amount'])
+
+client.transfer("INFERNA", 10, "EVRAddress")
+```
+
+---
+
+## 📡 Real-Time ZMQ Notifications
+
+```python
+from evrmore_rpc import EvrmoreClient
+from evrmore_rpc.zmq import EvrmoreZMQClient, ZMQTopic
+
+rpc = EvrmoreClient()
+zmq = EvrmoreZMQClient(rpc_client=rpc)
+
+@zmq.on(ZMQTopic.BLOCK)
+def handle_block(n):
+    print(f"[BLOCK] #{n.height} with {len(n.block['tx'])} txs")
+
+@zmq.on(ZMQTopic.TX)
+def handle_tx(n):
+    print(f"[TX] {n.tx['txid']} → {len(n.tx['vout'])} outputs")
+
+zmq.start()
+```
+
+Supports:
+- `HASH_BLOCK`, `HASH_TX`, `RAW_BLOCK`, `RAW_TX`
+- Enhanced `BLOCK`, `TX` (auto-decoded)
+- Asset-aware TX parsing
+
+---
+
+## 📊 Stress Test Benchmarks
+
+From `python3 -m evrmore_rpc.stress_test`, 100 calls to `getblockcount`, 10 concurrency:
+
+| Mode            | Time    | RPS      | Avg (ms) | Median | Min  | Max  |
+|-----------------|---------|----------|----------|--------|------|------|
+| Local Async     | 0.01 s  | 10442.42 | 0.59     | 0.50   | 0.39 | 1.84 |
+| Local Sync      | 0.06 s  | 1861.26  | 1.52     | 1.42   | 0.43 | 3.40 |
+| Remote Async    | 1.75 s  | 57.31    | 167.77   | 155.93 | 111  | 324  |
+| Remote Sync     | 1.86 s  | 53.83    | 160.39   | 163.26 | 112  | 310  |
+
+---
+
+## 🧰 Examples
+
+```bash
+python3 -m evrmore_rpc.stress_test --sync --remote
+```
+
+| File                  | Purpose                                     |
+|-----------------------|---------------------------------------------|
+| `readme_test.py`      | Basic synchronous and async usage demo      |
+| `stress_test.py`      | Performance benchmark w/ metrics            |
+| `connection_pooling.py`| Show pooling vs no-pooling RPC comparisons |
+| `flexible_config.py`  | Load settings from multiple sources         |
+| `rpc_coverage.py`     | Validate RPC method coverage + docs         |
+| `zmq_notifications.py`| Listen to real-time decoded blockchain txs  |
+
+---
+
+## ✅ Requirements
+
+- Python 3.8 or higher
+- Evrmore daemon with RPC and optional ZMQ enabled
+
+---
+
+## 🪪 License
+
+MIT — See [LICENSE](LICENSE)
+
+---
+
+## 🤝 Contributing
+
+PRs welcome!
+
+```bash
+git clone https://github.com/manticoretechnologies/evrmore-rpc-dev
+cd evrmore-rpc
+python3 -m venv .venv && source .venv/bin/activate
+pip install -e .[dev]
+```
+
+Run tests:
+
+```bash
+python3 -m evrmore_rpc.stress_test
+```
+
+---
+
+## 🧭 Summary
+
+`evrmore-rpc` is a production-grade toolkit for Evrmore developers. Whether you're building block explorers, trading platforms, or indexers, it's engineered to deliver speed, reliability, and seamless integration with the Evrmore chain.
+
+# WebSocket Integration Guide
+
+This guide covers how to use WebSocket notifications with the `evrmore-rpc` package to receive real-time blockchain updates.
+
+## Overview
+
+The `EvrmoreWebSocketClient` provides a modern interface for receiving real-time blockchain notifications via WebSocket. It supports:
+
+- Automatic context detection (sync/async)
+- Enhanced asset metadata in decoded transactions
+- Automatic reconnection on connection loss
+- Clean shutdown and resource management
+- Typed notification data with structured fields
+
+## Configuration
+
+### Required evrmore.conf Settings
+
+Add these lines to your `evrmore.conf`:
+
+```ini
+server=1
+rpcallowip=127.0.0.1
+rpcbind=127.0.0.1
+```
+
+### Client Setup
+
+```python
+from evrmore_rpc import EvrmoreClient
+from evrmore_rpc.websocket import EvrmoreWebSocketClient, WebSocketTopic
+
+# Create RPC client for auto-decoding
+rpc = EvrmoreClient()
+
+# Create WebSocket client
+ws = EvrmoreWebSocketClient(
+    ws_host="127.0.0.1",
+    ws_port=8332,
+    topics=[WebSocketTopic.BLOCK, WebSocketTopic.TX],
+    rpc_client=rpc,
+    auto_decode=True
+)
+```
+
+## Available Topics
+
+| Topic | Description | Requires RPC |
+|-------|-------------|-------------|
+| `BLOCK` | Block notifications | Yes |
+| `TX` | Transaction notifications | Yes |
+| `ASSET` | Asset notifications | Yes |
+| `ADDRESS` | Address notifications | Yes |
+
+## Event Handlers
+
+### Block Notifications
+
+```python
+@ws.on(WebSocketTopic.BLOCK)
+def handle_block(notification):
+    print(f"Block #{notification.height}")
+    print(f"Hash: {notification.hash}")
+    print(f"Transactions: {len(notification.tx)}")
     
-    # Create ZMQ client
-    zmq_client = EvrmoreZMQClient()
+    # Access block data
+    block = notification.block
+    print(f"Size: {block.get('size', 'N/A')} bytes")
+    print(f"Time: {block.get('time', 'N/A')}")
+    print(f"Difficulty: {block.get('difficulty', 'N/A')}")
+```
+
+### Transaction Notifications
+
+```python
+@ws.on(WebSocketTopic.TX)
+def handle_tx(notification):
+    print(f"TX {notification.txid}")
+    print(f"Size: {notification.size} bytes")
+    print(f"Version: {notification.version}")
     
-    # Create WebSocket server
-    server = EvrmoreWebSocketServer(
-        rpc_client=rpc_client,
-        zmq_client=zmq_client,
-        host="localhost",
-        port=8765
-    )
+    # Check for asset data
+    if notification.has_assets:
+        print("\nAsset Information:")
+        for asset in notification.asset_info:
+            print(f"Asset: {asset.name}")
+            print(f"Amount: {asset.amount}")
+            print(f"Type: {asset.type}")
+```
+
+## Usage Examples
+
+### Synchronous Usage
+
+```python
+import signal
+import sys
+from evrmore_rpc.websocket import EvrmoreWebSocketClient, WebSocketTopic
+
+# Initialize client
+ws = EvrmoreWebSocketClient()
+
+# Handle Ctrl+C
+def signal_handler(sig, frame):
+    print("\nShutting down...")
+    ws.stop()
+    sys.exit(0)
+
+signal.signal(signal.SIGINT, signal_handler)
+
+# Register handlers
+@ws.on(WebSocketTopic.BLOCK)
+def handle_block(notification):
+    print(f"Block #{notification.height}")
+
+@ws.on(WebSocketTopic.TX)
+def handle_tx(notification):
+    print(f"TX {notification.txid}")
+
+# Start the client
+ws.start()
+
+# Keep running
+while True:
+    import time
+    time.sleep(1)
+```
+
+### Asynchronous Usage
+
+```python
+import asyncio
+from evrmore_rpc.websocket import EvrmoreWebSocketClient, WebSocketTopic
+
+async def main():
+    # Initialize client
+    ws = EvrmoreWebSocketClient()
+
+    # Register handlers
+    @ws.on(WebSocketTopic.BLOCK)
+    async def handle_block(notification):
+        print(f"Block #{notification.height}")
+
+    @ws.on(WebSocketTopic.TX)
+    async def handle_tx(notification):
+        print(f"TX {notification.txid}")
+
+    # Start the client
+    await ws.start()
     
-    # Start the server
-    await server.start()
-    print(f"WebSocket server started on ws://{server.host}:{server.port}")
-    
-    # Keep the server running until interrupted
     try:
+        # Keep running
         while True:
             await asyncio.sleep(1)
+    except KeyboardInterrupt:
+        print("\nShutting down...")
     finally:
-        # Stop the server
-        await server.stop()
-        print("WebSocket server stopped")
-
-if __name__ == "__main__":
-    asyncio.run(main())
-```
-
-### Initialization
-
-```python
-from evrmore_rpc import EvrmoreRPCClient
-from evrmore_rpc.zmq import EvrmoreZMQClient
-from evrmore_rpc.websockets import EvrmoreWebSocketServer
-
-# Create clients
-rpc_client = EvrmoreRPCClient()
-zmq_client = EvrmoreZMQClient()
-
-# Create server with default settings (localhost:8765)
-server = EvrmoreWebSocketServer(
-    rpc_client=rpc_client,
-    zmq_client=zmq_client
-)
-
-# Create server with custom settings
-server = EvrmoreWebSocketServer(
-    rpc_client=rpc_client,
-    zmq_client=zmq_client,
-    host="0.0.0.0",  # Listen on all interfaces
-    port=8765,
-    ping_interval=30,  # Send ping every 30 seconds
-    ping_timeout=10    # Wait 10 seconds for pong response
-)
-```
-
-### Parameters
-
-- `rpc_client` (EvrmoreRPCClient): The RPC client to use for blockchain queries
-- `zmq_client` (EvrmoreZMQClient): The ZMQ client to use for real-time notifications
-- `host` (str): The host to bind the WebSocket server to (default: "localhost")
-- `port` (int): The port to bind the WebSocket server to (default: 8765)
-- `ping_interval` (Optional[float]): How often to ping clients in seconds (default: 20)
-- `ping_timeout` (Optional[float]): How long to wait for pong response in seconds (default: 20)
-
-### Starting and Stopping
-
-The `EvrmoreWebSocketServer` class provides methods for starting and stopping the server:
-
-```python
-import asyncio
-from evrmore_rpc import EvrmoreRPCClient
-from evrmore_rpc.zmq import EvrmoreZMQClient
-from evrmore_rpc.websockets import EvrmoreWebSocketServer
-
-async def main():
-    # Create clients
-    rpc_client = EvrmoreRPCClient()
-    zmq_client = EvrmoreZMQClient()
-    
-    # Create server
-    server = EvrmoreWebSocketServer(
-        rpc_client=rpc_client,
-        zmq_client=zmq_client
-    )
-    
-    # Start the server
-    await server.start()
-    print(f"WebSocket server started on ws://{server.host}:{server.port}")
-    
-    # Keep running for a while
-    await asyncio.sleep(60)
-    
-    # Stop the server
-    await server.stop()
-    print("WebSocket server stopped")
+        await ws.stop()
 
 asyncio.run(main())
 ```
 
-## WebSocket Client
+## Advanced Features
 
-The `EvrmoreWebSocketClient` class provides a WebSocket client that can connect to an `EvrmoreWebSocketServer` and receive real-time blockchain events.
-
-### Basic Usage
+### Custom Message Processing
 
 ```python
-import asyncio
-from evrmore_rpc.websockets import EvrmoreWebSocketClient
-
-async def main():
-    # Create a WebSocket client
-    client = EvrmoreWebSocketClient(uri="ws://localhost:8765")
-    
-    # Connect to the WebSocket server
-    await client.connect()
-    
-    # Subscribe to block and transaction notifications
-    await client.subscribe("blocks")
-    await client.subscribe("transactions")
-    
-    # Process incoming messages
-    async for message in client:
-        if message.type == "block":
-            block_data = message.data
-            print(f"New block: {block_data.hash} (height: {block_data.height})")
-            
-        elif message.type == "transaction":
-            tx_data = message.data
-            print(f"New transaction: {tx_data.txid}")
-    
-    # Disconnect
-    await client.disconnect()
-
-if __name__ == "__main__":
-    asyncio.run(main())
-```
-
-### Initialization
-
-```python
-from evrmore_rpc.websockets import EvrmoreWebSocketClient
-
-# Create a client with default settings
-client = EvrmoreWebSocketClient()
-
-# Create a client with custom settings
-client = EvrmoreWebSocketClient(
-    uri="ws://example.com:8765",
-    ping_interval=30,  # Send ping every 30 seconds
-    ping_timeout=10    # Wait 10 seconds for pong response
-)
-```
-
-### Parameters
-
-- `uri` (str): The WebSocket server URI (default: "ws://localhost:8765")
-- `ping_interval` (Optional[float]): How often to ping the server in seconds (default: 20)
-- `ping_timeout` (Optional[float]): How long to wait for pong response in seconds (default: 20)
-
-### Connecting and Disconnecting
-
-The `EvrmoreWebSocketClient` class provides methods for connecting to and disconnecting from a WebSocket server:
-
-```python
-import asyncio
-from evrmore_rpc.websockets import EvrmoreWebSocketClient
-
-async def main():
-    # Create a client
-    client = EvrmoreWebSocketClient()
-    
-    # Connect to the server
-    await client.connect()
-    print("Connected to WebSocket server")
-    
-    # Keep connected for a while
-    await asyncio.sleep(60)
-    
-    # Disconnect
-    await client.disconnect()
-    print("Disconnected from WebSocket server")
-
-asyncio.run(main())
-```
-
-### Subscribing to Topics
-
-The `EvrmoreWebSocketClient` class provides methods for subscribing to and unsubscribing from topics:
-
-```python
-import asyncio
-from evrmore_rpc.websockets import EvrmoreWebSocketClient
-
-async def main():
-    # Create a client
-    client = EvrmoreWebSocketClient()
-    
-    # Connect to the server
-    await client.connect()
-    
-    # Subscribe to topics
-    await client.subscribe("blocks")
-    await client.subscribe("transactions")
-    await client.subscribe("assets")
-    
-    # Process messages for a while
-    for _ in range(10):
-        message = await client.receive()
-        print(f"Received message: {message.type}")
-    
-    # Unsubscribe from a topic
-    await client.unsubscribe("transactions")
-    
-    # Process more messages
-    for _ in range(5):
-        message = await client.receive()
-        print(f"Received message: {message.type}")
-    
-    # Disconnect
-    await client.disconnect()
-
-asyncio.run(main())
-```
-
-### Receiving Messages
-
-The `EvrmoreWebSocketClient` class provides methods for receiving messages:
-
-```python
-import asyncio
-from evrmore_rpc.websockets import EvrmoreWebSocketClient
-
-async def main():
-    # Create a client
-    client = EvrmoreWebSocketClient()
-    
-    # Connect to the server
-    await client.connect()
-    
-    # Subscribe to topics
-    await client.subscribe("blocks")
-    await client.subscribe("transactions")
-    
-    # Receive a single message
-    message = await client.receive()
-    print(f"Received message: {message.type}")
-    
-    # Receive messages in a loop
-    try:
-        while True:
-            message = await client.receive()
-            print(f"Received message: {message.type}")
-    except asyncio.CancelledError:
-        # Handle cancellation
-        pass
-    finally:
-        # Disconnect
-        await client.disconnect()
-
-asyncio.run(main())
-```
-
-### Async Iterator
-
-The `EvrmoreWebSocketClient` class also supports the async iterator protocol, which makes it easy to process messages in a loop:
-
-```python
-import asyncio
-from evrmore_rpc.websockets import EvrmoreWebSocketClient
-
-async def main():
-    # Create a client
-    client = EvrmoreWebSocketClient()
-    
-    # Connect to the server
-    await client.connect()
-    
-    # Subscribe to topics
-    await client.subscribe("blocks")
-    await client.subscribe("transactions")
-    
-    # Process messages using async for
-    try:
-        async for message in client:
-            print(f"Received message: {message.type}")
-            
-            # Process message based on type
-            if message.type == "block":
-                block_data = message.data
-                print(f"New block: {block_data.hash} (height: {block_data.height})")
-                
-            elif message.type == "transaction":
-                tx_data = message.data
-                print(f"New transaction: {tx_data.txid}")
-    except asyncio.CancelledError:
-        # Handle cancellation
-        pass
-    finally:
-        # Disconnect
-        await client.disconnect()
-
-asyncio.run(main())
-```
-
-## WebSocket Message Format
-
-The WebSocket messages exchanged between the server and clients follow a specific format.
-
-### Server to Client Messages
-
-Messages sent from the server to clients have the following format:
-
-```json
-{
-    "type": "block",
-    "data": {
-        "hash": "000000000019d6689c085ae165831e934ff763ae46a2a6c172b3f1b60a8ce26f",
-        "height": 1,
-        "time": 1231006505,
-        "tx_count": 1,
-        "size": 285
-    }
-}
-```
-
-The `type` field indicates the type of message, and the `data` field contains the message data.
-
-#### Block Messages
-
-Block messages have the following format:
-
-```json
-{
-    "type": "block",
-    "data": {
-        "hash": "000000000019d6689c085ae165831e934ff763ae46a2a6c172b3f1b60a8ce26f",
-        "height": 1,
-        "time": 1231006505,
-        "tx_count": 1,
-        "size": 285
-    }
-}
-```
-
-#### Transaction Messages
-
-Transaction messages have the following format:
-
-```json
-{
-    "type": "transaction",
-    "data": {
-        "txid": "4a5e1e4baab89f3a32518a88c31bc87f618f76673e2cc77ab2127b7afdeda33b",
-        "size": 285,
-        "vsize": 285,
-        "version": 1,
-        "locktime": 0,
-        "vin_count": 1,
-        "vout_count": 1
-    }
-}
-```
-
-#### Asset Messages
-
-Asset messages have the following format:
-
-```json
-{
-    "type": "asset",
-    "data": {
-        "txid": "4a5e1e4baab89f3a32518a88c31bc87f618f76673e2cc77ab2127b7afdeda33b",
-        "asset": "ASSET_NAME",
-        "amount": 100,
-        "type": "transfer"
-    }
-}
-```
-
-#### Mempool Messages
-
-Mempool messages have the following format:
-
-```json
-{
-    "type": "mempool",
-    "data": {
-        "size": 100,
-        "bytes": 28500,
-        "usage": 112000
-    }
-}
-```
-
-### Client to Server Messages
-
-Messages sent from clients to the server have the following format:
-
-#### Subscribe Messages
-
-```json
-{
-    "action": "subscribe",
-    "topic": "blocks"
-}
-```
-
-#### Unsubscribe Messages
-
-```json
-{
-    "action": "unsubscribe",
-    "topic": "blocks"
-}
-```
-
-#### Command Messages
-
-```json
-{
-    "command": "getblockchaininfo",
-    "params": []
-}
-```
-
-## Advanced Usage
-
-### Custom Message Handlers
-
-You can create custom message handlers for the WebSocket client:
-
-```python
-import asyncio
-import json
-from evrmore_rpc.websockets import EvrmoreWebSocketClient
-
-class CustomWebSocketClient(EvrmoreWebSocketClient):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.block_count = 0
-        self.tx_count = 0
+class BlockchainMonitor:
+    def __init__(self):
+        self.ws_client = EvrmoreWebSocketClient()
+        self.rpc_client = EvrmoreClient()
+        self.blocks_processed = 0
+        self.transactions_processed = 0
+        self.asset_transfers = []
         
-    async def handle_block(self, block_data):
-        """Handle a block message."""
-        self.block_count += 1
-        print(f"New block: {block_data.hash} (height: {block_data.height})")
-        print(f"Total blocks received: {self.block_count}")
+    async def start(self):
+        # Register handlers
+        self.ws_client.on_block(self.handle_block)
+        self.ws_client.on_transaction(self.handle_transaction)
         
-    async def handle_transaction(self, tx_data):
-        """Handle a transaction message."""
-        self.tx_count += 1
-        print(f"New transaction: {tx_data.txid}")
-        print(f"Total transactions received: {self.tx_count}")
+        # Start the WebSocket client
+        await self.ws_client.start()
+        print("Blockchain monitor started")
         
-    async def process_messages(self):
-        """Process messages from the server."""
-        async for message in self:
-            if message.type == "block":
-                await self.handle_block(message.data)
-            elif message.type == "transaction":
-                await self.handle_transaction(message.data)
-
-async def main():
-    # Create a custom client
-    client = CustomWebSocketClient()
-    
-    # Connect to the server
-    await client.connect()
-    
-    # Subscribe to topics
-    await client.subscribe("blocks")
-    await client.subscribe("transactions")
-    
-    # Process messages
-    try:
-        await client.process_messages()
-    except asyncio.CancelledError:
-        pass
-    finally:
-        await client.disconnect()
-
-asyncio.run(main())
-```
-
-### Integration with Web Frameworks
-
-The WebSocket client can be integrated with web frameworks like FastAPI:
-
-```python
-import asyncio
-from fastapi import FastAPI, WebSocket, WebSocketDisconnect
-from fastapi.responses import HTMLResponse
-from evrmore_rpc.websockets import EvrmoreWebSocketClient
-
-app = FastAPI()
-
-# HTML for a simple WebSocket client
-html = """
-<!DOCTYPE html>
-<html>
-    <head>
-        <title>Evrmore WebSocket Client</title>
-    </head>
-    <body>
-        <h1>Evrmore WebSocket Client</h1>
-        <div id="messages"></div>
-        <script>
-            var ws = new WebSocket("ws://localhost:8000/ws");
-            ws.onmessage = function(event) {
-                var messages = document.getElementById('messages');
-                var message = document.createElement('p');
-                message.textContent = event.data;
-                messages.appendChild(message);
-            };
-        </script>
-    </body>
-</html>
-"""
-
-@app.get("/")
-async def get():
-    return HTMLResponse(html)
-
-@app.websocket("/ws")
-async def websocket_endpoint(websocket: WebSocket):
-    await websocket.accept()
-    
-    # Create a WebSocket client to connect to the Evrmore WebSocket server
-    client = EvrmoreWebSocketClient()
-    
-    try:
-        # Connect to the Evrmore WebSocket server
-        await client.connect()
-        
-        # Subscribe to topics
-        await client.subscribe("blocks")
-        await client.subscribe("transactions")
-        
-        # Forward messages from the Evrmore WebSocket server to the web client
-        async for message in client:
-            await websocket.send_text(f"{message.type}: {message.data}")
-    
-    except WebSocketDisconnect:
-        # Web client disconnected
-        pass
-    except Exception as e:
-        # Handle other exceptions
-        print(f"Error: {e}")
-    finally:
-        # Disconnect from the Evrmore WebSocket server
-        await client.disconnect()
-```
-
-### Custom WebSocket Server
-
-You can create a custom WebSocket server that extends the functionality of `EvrmoreWebSocketServer`:
-
-```python
-import asyncio
-import json
-import logging
-from typing import Dict, Set, Any
-
-from evrmore_rpc import EvrmoreRPCClient
-from evrmore_rpc.zmq import EvrmoreZMQClient
-from evrmore_rpc.websockets import EvrmoreWebSocketServer
-
-# Configure logging
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger("custom-websocket-server")
-
-class CustomWebSocketServer(EvrmoreWebSocketServer):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.custom_topics = {
-            "large_blocks": set(),
-            "asset_transfers": set()
-        }
+    async def stop(self):
+        await self.ws_client.stop()
+        print("Blockchain monitor stopped")
         
     async def handle_block(self, notification):
-        """Handle a block notification."""
-        # Call the parent method to handle the notification
-        await super().handle_block(notification)
-        
-        # Get block details
-        block_hash = notification.hex
+        block_hash = notification.hash
         block = self.rpc_client.getblock(block_hash)
         
-        # Check if this is a large block
-        if len(block.tx) > 100:
-            # Prepare message
-            message = {
-                "type": "large_block",
-                "data": {
-                    "hash": block.hash,
-                    "height": block.height,
-                    "time": block.time,
-                    "tx_count": len(block.tx),
-                    "size": block.size
-                }
-            }
-            
-            # Broadcast to subscribers
-            await self.broadcast("large_blocks", message)
-            
-    async def handle_transaction(self, notification):
-        """Handle a transaction notification."""
-        # Call the parent method to handle the notification
-        await super().handle_transaction(notification)
+        self.blocks_processed += 1
+        print(f"New block: {block.hash} (height: {block.height})")
+        print(f"Block contains {len(block.tx)} transactions")
         
-        # Get transaction details
-        txid = notification.hex
+        # Analyze block data
+        if len(block.tx) > 100:
+            print(f"Large block detected: {len(block.tx)} transactions")
+        
+    async def handle_transaction(self, notification):
+        txid = notification.txid
         
         try:
             tx = self.rpc_client.getrawtransaction(txid, True)
+            self.transactions_processed += 1
             
             # Check for asset transfers
             for vout in tx.vout:
                 if "asset" in vout.get("scriptPubKey", {}).get("asset", {}):
                     asset = vout["scriptPubKey"]["asset"]
+                    print(f"Asset transfer detected: {asset['name']} ({asset['amount']})")
                     
-                    # Prepare asset message
-                    asset_message = {
-                        "type": "asset_transfer",
-                        "data": {
-                            "txid": tx.txid,
-                            "asset": asset["name"],
-                            "amount": asset["amount"],
-                            "from": "unknown",  # Would need to look up the input address
-                            "to": vout["scriptPubKey"].get("addresses", ["unknown"])[0]
-                        }
-                    }
-                    
-                    # Broadcast to asset transfer subscribers
-                    await self.broadcast("asset_transfers", asset_message)
+                    self.asset_transfers.append({
+                        "txid": txid,
+                        "asset": asset["name"],
+                        "amount": asset["amount"],
+                        "time": tx.time if hasattr(tx, "time") else None
+                    })
         except Exception as e:
-            logger.error(f"Error handling transaction: {e}")
-            
-    async def handle_client_message(self, websocket, message):
-        """Handle a message from a client."""
-        try:
-            data = json.loads(message)
-            
-            # Handle custom subscriptions
-            if "action" in data and "topic" in data:
-                action = data["action"]
-                topic = data["topic"]
-                
-                if topic in self.custom_topics:
-                    if action == "subscribe":
-                        self.custom_topics[topic].add(websocket)
-                        await websocket.send(json.dumps({
-                            "type": "subscription",
-                            "status": "success",
-                            "topic": topic
-                        }))
-                        logger.info(f"Client subscribed to custom topic: {topic}")
-                    elif action == "unsubscribe":
-                        if websocket in self.custom_topics[topic]:
-                            self.custom_topics[topic].remove(websocket)
-                            await websocket.send(json.dumps({
-                                "type": "subscription",
-                                "status": "success",
-                                "topic": topic,
-                                "action": "unsubscribe"
-                            }))
-                            logger.info(f"Client unsubscribed from custom topic: {topic}")
-                    return True
-            
-            # If not handled, let the parent class handle it
-            return await super().handle_client_message(websocket, message)
-            
-        except json.JSONDecodeError:
-            await websocket.send(json.dumps({
-                "type": "error",
-                "message": "Invalid JSON"
-            }))
-            return True
-            
-    async def broadcast(self, topic, message):
-        """Broadcast a message to subscribers of a topic."""
-        if topic in self.subscriptions:
-            # Use the parent method for standard topics
-            await super().broadcast(topic, message)
-        elif topic in self.custom_topics:
-            # Handle custom topics
-            subscribers = self.custom_topics[topic]
-            if subscribers:
-                message_str = json.dumps(message)
-                await asyncio.gather(
-                    *[client.send(message_str) for client in subscribers],
-                    return_exceptions=True
-                )
+            print(f"Error processing transaction {txid}: {e}")
+```
 
-async def main():
-    # Create clients
-    rpc_client = EvrmoreRPCClient()
-    zmq_client = EvrmoreZMQClient()
-    
-    # Create custom server
-    server = CustomWebSocketServer(
-        rpc_client=rpc_client,
-        zmq_client=zmq_client
-    )
-    
-    # Start the server
-    await server.start()
-    print(f"Custom WebSocket server started on ws://{server.host}:{server.port}")
-    
-    # Keep running until interrupted
-    try:
-        while True:
-            await asyncio.sleep(1)
-    except KeyboardInterrupt:
-        print("Interrupted by user")
-    finally:
-        await server.stop()
-        print("Custom WebSocket server stopped")
+## Error Handling
 
-if __name__ == "__main__":
-    asyncio.run(main()) 
+```python
+from evrmore_rpc.websocket import EvrmoreWebSocketError
+
+try:
+    ws.start()
+except EvrmoreWebSocketError as e:
+    print(f"WebSocket error: {e}")
+except Exception as e:
+    print(f"Unexpected error: {e}")
+```
+
+## Performance Considerations
+
+- Use appropriate reconnection settings
+- Set appropriate cleanup timeouts
+- Consider using async mode for better performance
+- Monitor memory usage with large transaction volumes
+- Use connection pooling for multiple clients
+
+## See Also
+
+- [Getting Started](getting-started.md) for basic usage
+- [API Reference](api-reference.md) for detailed API docs
+- [Examples](examples.md) for more code samples
+- [Advanced Usage](advanced.md) for production patterns

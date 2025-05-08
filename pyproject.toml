@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "evrmore-rpc"
-version = "4.0.1"
+version = "4.0.2"
 description = "A high-performance Python wrapper for Evrmore blockchain RPC commands with a seamless API"
 readme = "README.md"
 requires-python = ">=3.8"
@@ -49,16 +49,34 @@ dev = [
     "pytest-asyncio>=0.18.0",
     "twine",
     "setuptools",
-    "build"
-]
-all = [
+    "build",
 ]
 
+docs = [
+    "mkdocs>=1.5",
+    "mkdocs-material>=9.5",
+    "mkdocstrings[python]>=0.24",
+    "jinja2>=3.1.2",
+]
+
+all = [
+    "pytest>=7.0.0",
+    "pytest-asyncio>=0.18.0",
+    "twine",
+    "setuptools",
+    "build",
+    "mkdocs>=1.5",
+    "mkdocs-material>=9.5",
+    "mkdocstrings[python]>=0.24",
+    "jinja2>=3.1.2",
+]
+
+
 [project.urls]
-Homepage = "https://github.com/ManticoreTechnology/evrmore-rpc-dev"
-Documentation = "https://evrmore-rpc.readthedocs.io/"
-Repository = "https://github.com/ManticoreTechnology/evrmore-rpc-dev.git"
-Issues = "https://github.com/ManticoreTechnology/evrmore-rpc-dev/issues"
+Homepage = "https://github.com/ManticoreTechnologies/evrmore-rpc-dev"
+Documentation = "https://manticoretechnologies.github.io/evrmore-rpc-dev/"
+Repository = "https://github.com/ManticoreTechnologies/evrmore-rpc-dev.git"
+Issues = "https://github.com/ManticoreTechnologies/evrmore-rpc-dev/issues"
 
 [project.scripts]
 evrmore-rpc-stress = "evrmore_rpc.stress_test:main"

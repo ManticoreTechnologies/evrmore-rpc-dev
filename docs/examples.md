@@ -1,834 +1,559 @@
-# Examples
+# evrmore-rpc: Python Client for Evrmore Blockchain
 
-The `evrmore-rpc` package includes several examples demonstrating its functionality. These examples are available in the [examples directory](https://github.com/ManticoreTechnology/evrmore-rpc/tree/main/examples) of the repository.
+[![PyPI version](https://badge.fury.io/py/evrmore-rpc.svg)](https://badge.fury.io/py/evrmore-rpc)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Python Versions](https://img.shields.io/pypi/pyversions/evrmore-rpc.svg)](https://pypi.org/project/evrmore-rpc/)
 
-## Basic RPC Usage
+A high-performance, full-featured Python client for the [Evrmore](https://evrmore.com) blockchain. Designed for real-world applications like wallets, explorers, and exchanges, it includes synchronous and asynchronous RPC support, auto-decoding ZMQ streams, typed WebSocket communication, structured data models, and powerful developer tools.
 
-The basic RPC usage examples demonstrate how to use the synchronous RPC client to interact with the Evrmore blockchain.
+---
 
-### Get Blockchain Info
+## 🚀 Features
+
+- **🔄 Context-Aware**: Auto-adapts between sync and async execution
+- **⚙️ Flexible Config**: Load from `evrmore.conf`, environment, or arguments
+- **🔐 Cookie & Auth**: Supports `.cookie` file and manual RPC credentials
+- **💡 Typed RPC Coverage**: All RPC methods typed with Pydantic models
+- **⚡ Connection Pooling**: Fast RPC calls with keep-alive sessions
+- **🧠 Asset Intelligence**: Decodes asset transactions, supply, metadata
+- **📡 ZMQ Real-Time Streams**: HASH_*, RAW_*, BLOCK, TX w/ decoding
+- **🌐 WebSocket Support**: Realtime server and client push subscriptions
+- **📊 CLI & Stress Tools**: Benchmark, test, and audit performance
+- **🧪 Extensive Examples**: From zero to production-ready integrations
+
+---
+
+## 📦 Installation
+
+```bash
+pip install evrmore-rpc
+```
+
+Optional extras:
+
+```bash
+pip install evrmore-rpc[websockets]     # For WebSocket support
+pip install evrmore-rpc[full]           # All optional dependencies
+```
+
+---
+
+## 🧪 Quick Start
 
 ```python
-from evrmore_rpc import EvrmoreRPCClient
+from evrmore_rpc import EvrmoreClient
 
-# Create a client
-client = EvrmoreRPCClient()
-
-# Get blockchain info
+client = EvrmoreClient()
 info = client.getblockchaininfo()
-print(f"Current block height: {info.blocks}")
-print(f"Chain: {info.chain}")
-print(f"Difficulty: {info.difficulty}")
+print("Height:", info['blocks'])
 ```
 
-### Get Block Data
+---
+
+## 🧭 Synchronous API Example
 
 ```python
-from evrmore_rpc import EvrmoreRPCClient
+from evrmore_rpc import EvrmoreClient
 
-# Create a client
-client = EvrmoreRPCClient()
+client = EvrmoreClient()
+info = client.getblockchaininfo()
+print(f"Block height: {info.blocks}")
 
-# Get a block
-block_hash = client.getblockhash(1)
-block = client.getblock(block_hash)
-print(f"Block #1 hash: {block.hash}")
-print(f"Block #1 time: {block.time}")
-print(f"Block #1 transactions: {len(block.tx)}")
+asset_info = client.getassetdata("INFERNA")
+print(asset_info.amount)
+
+client.transfer("INFERNA", 10, "EVRAddress")
 ```
 
-### List Assets
+---
 
-```python
-from evrmore_rpc import EvrmoreRPCClient
-
-# Create a client
-client = EvrmoreRPCClient()
-
-# List assets
-assets = client.listassets()
-print(f"Found {len(assets)} assets")
-
-# List my assets
-my_assets = client.listmyassets()
-print(f"Found {len(my_assets)} assets in my wallet")
-```
-
-## Asynchronous RPC Usage
-
-The asynchronous RPC usage examples demonstrate how to use the asynchronous RPC client to interact with the Evrmore blockchain.
-
-### Get Blockchain Info
+## 🔁 Async Usage
 
 ```python
 import asyncio
-from evrmore_rpc import EvrmoreAsyncRPCClient
+from evrmore_rpc import EvrmoreClient
 
 async def main():
-    # Create a client
-    async with EvrmoreAsyncRPCClient() as client:
-        # Get blockchain info
-        info = await client.getblockchaininfo()
-        print(f"Current block height: {info.blocks}")
-        print(f"Chain: {info.chain}")
-        print(f"Difficulty: {info.difficulty}")
+    client = EvrmoreClient()
+    info = await client.getblockchaininfo()
+    print("Height:", info['blocks'])
+    await client.close()
 
-if __name__ == "__main__":
-    asyncio.run(main())
+asyncio.run(main())
 ```
 
-### Concurrent Execution
+---
+
+## 🔧 Configuration Examples
 
 ```python
-import asyncio
-from evrmore_rpc import EvrmoreAsyncRPCClient
+# From evrmore.conf
+client = EvrmoreClient()
 
-async def main():
-    # Create a client
-    async with EvrmoreAsyncRPCClient() as client:
-        # Execute multiple commands concurrently
-        info, block_hash, mempool_info = await asyncio.gather(
-            client.getblockchaininfo(),
-            client.getblockhash(1),
-            client.getmempoolinfo()
-        )
-        
-        # Get block details
-        block = await client.getblock(block_hash)
-        
-        # Print results
-        print(f"Current block height: {info.blocks}")
-        print(f"Block #1 hash: {block.hash}")
-        print(f"Mempool size: {mempool_info['size']}")
+# From env vars (EVR_RPC_*)
+client = EvrmoreClient()
 
-if __name__ == "__main__":
-    asyncio.run(main())
+# Manual override
+client = EvrmoreClient(url="http://localhost:8819", rpcuser="user", rpcpassword="pass")
+
+# Testnet flag
+client = EvrmoreClient(testnet=True)
 ```
 
-## ZMQ Notifications
+---
 
-The ZMQ notifications examples demonstrate how to use the ZMQ client to receive real-time notifications from the Evrmore blockchain.
-
-### Block and Transaction Notifications
+## 💰 Asset Support
 
 ```python
-import asyncio
+info = client.getassetdata("INFERNA")
+print(info['amount'])
+
+client.transfer("INFERNA", 10, "EVRAddress")
+```
+
+---
+
+## 📡 Real-Time ZMQ Notifications
+
+```python
+from evrmore_rpc import EvrmoreClient
 from evrmore_rpc.zmq import EvrmoreZMQClient, ZMQTopic
 
-async def handle_block(notification):
-    print(f"New block: {notification.hex}")
+rpc = EvrmoreClient()
+zmq = EvrmoreZMQClient(rpc_client=rpc)
 
-async def handle_transaction(notification):
-    print(f"New transaction: {notification.hex}")
+@zmq.on(ZMQTopic.BLOCK)
+def handle_block(n):
+    print(f"[BLOCK] #{n.height} with {len(n.block['tx'])} txs")
 
-async def main():
-    # Create a ZMQ client
-    client = EvrmoreZMQClient(
-        address="tcp://127.0.0.1:28332",
-        topics=[ZMQTopic.HASH_BLOCK, ZMQTopic.HASH_TX]
-    )
-    
-    # Register handlers
-    client.on_block(handle_block)
-    client.on_transaction(handle_transaction)
-    
-    # Start the client
-    await client.start()
-    
-    # Keep running until interrupted
-    try:
-        while True:
-            await asyncio.sleep(1)
-    finally:
-        await client.stop()
+@zmq.on(ZMQTopic.TX)
+def handle_tx(n):
+    print(f"[TX] {n.tx['txid']} → {len(n.tx['vout'])} outputs")
 
-if __name__ == "__main__":
-    asyncio.run(main())
+zmq.start()
 ```
 
-### Transaction Analysis
+Supports:
+- `HASH_BLOCK`, `HASH_TX`, `RAW_BLOCK`, `RAW_TX`
+- Enhanced `BLOCK`, `TX` (auto-decoded)
+- Asset-aware TX parsing
+
+---
+
+## 🌐 WebSocket Subscriptions
 
 ```python
-import asyncio
-from evrmore_rpc import EvrmoreRPCClient
-from evrmore_rpc.zmq import EvrmoreZMQClient, ZMQTopic
-
-async def handle_transaction(notification):
-    txid = notification.hex
-    print(f"New transaction: {txid}")
-    
-    # Get transaction details
-    client = EvrmoreRPCClient()
-    tx = client.getrawtransaction(txid, True)
-    
-    # Analyze transaction
-    print(f"Transaction size: {tx.size} bytes")
-    print(f"Transaction inputs: {len(tx.vin)}")
-    print(f"Transaction outputs: {len(tx.vout)}")
-    
-    # Check for asset transfers
-    for vout in tx.vout:
-        if "asset" in vout.get("scriptPubKey", {}).get("asset", {}):
-            asset = vout["scriptPubKey"]["asset"]
-            print(f"Asset transfer: {asset['name']} ({asset['amount']})")
-
-async def main():
-    # Create a ZMQ client
-    client = EvrmoreZMQClient(
-        address="tcp://127.0.0.1:28332",
-        topics=[ZMQTopic.HASH_TX]
-    )
-    
-    # Register handler
-    client.on_transaction(handle_transaction)
-    
-    # Start the client
-    await client.start()
-    
-    # Keep running until interrupted
-    try:
-        while True:
-            await asyncio.sleep(1)
-    finally:
-        await client.stop()
-
-if __name__ == "__main__":
-    asyncio.run(main())
-```
-
-## WebSockets Support
-
-The WebSockets examples demonstrate how to use the WebSockets client and server to receive real-time notifications from the Evrmore blockchain.
-
-### WebSocket Client
-
-```python
-import asyncio
 from evrmore_rpc.websockets import EvrmoreWebSocketClient
+import asyncio
 
 async def main():
-    # Create a WebSocket client
     client = EvrmoreWebSocketClient(uri="ws://localhost:8765")
-    
-    # Connect to the WebSocket server
     await client.connect()
-    
-    # Subscribe to block and transaction notifications
     await client.subscribe("blocks")
     await client.subscribe("transactions")
-    
-    # Process incoming messages
+
     async for message in client:
-        if message.type == "block":
-            block_data = message.data
-            print(f"New block: {block_data.hash} (height: {block_data.height})")
-            
-        elif message.type == "transaction":
-            tx_data = message.data
-            print(f"New transaction: {tx_data.txid}")
-    
-    # Disconnect
-    await client.disconnect()
+        print(f"{message.type}: {message.data}")
 
-if __name__ == "__main__":
-    asyncio.run(main())
+asyncio.run(main())
 ```
 
-### WebSocket Server
+Server available via `EvrmoreWebSocketServer` with ZMQ -> WS bridge built-in.
 
-```python
-import asyncio
-from evrmore_rpc import EvrmoreRPCClient
-from evrmore_rpc.zmq import EvrmoreZMQClient
-from evrmore_rpc.websockets import EvrmoreWebSocketServer
+---
 
-async def main():
-    # Create RPC client
-    rpc_client = EvrmoreRPCClient()
-    
-    # Create ZMQ client
-    zmq_client = EvrmoreZMQClient(
-        address="tcp://127.0.0.1:28332"
-    )
-    
-    # Create WebSocket server
-    server = EvrmoreWebSocketServer(
-        rpc_client=rpc_client,
-        zmq_client=zmq_client,
-        host="localhost",
-        port=8765
-    )
-    
-    # Start the server
-    await server.start()
-    print(f"WebSocket server started on ws://{server.host}:{server.port}")
-    
-    # Keep the server running until interrupted
-    try:
-        while True:
-            await asyncio.sleep(1)
-    finally:
-        # Stop the server
-        await server.stop()
-        print("WebSocket server stopped")
+## 📊 Stress Test Benchmarks
 
-if __name__ == "__main__":
-    asyncio.run(main())
+From `python3 -m evrmore_rpc.stress_test`, 100 calls to `getblockcount`, 10 concurrency:
+
+| Mode            | Time    | RPS      | Avg (ms) | Median | Min  | Max  |
+|-----------------|---------|----------|----------|--------|------|------|
+| Local Async     | 0.01 s  | 10442.42 | 0.59     | 0.50   | 0.39 | 1.84 |
+| Local Sync      | 0.06 s  | 1861.26  | 1.52     | 1.42   | 0.43 | 3.40 |
+| Remote Async    | 1.75 s  | 57.31    | 167.77   | 155.93 | 111  | 324  |
+| Remote Sync     | 1.86 s  | 53.83    | 160.39   | 163.26 | 112  | 310  |
+
+---
+
+## 🧰 Examples
+
+```bash
+python3 -m evrmore_rpc.stress_test --sync --remote
 ```
 
-## Asset Swap Platform
+| File                     | Purpose                                        |
+|--------------------------|------------------------------------------------|
+| `features/contextuality.py` | Auto detect sync/async usage context         |
+| `features/connection_pooling.py` | Demonstrate connection reuse efficiency     |
+| `features/complete_rpc_coverage.py` | Validate RPC method coverage             |
+| `features/flexible_config.py` | Load configuration from various sources     |
+| `features/basic_type_safety.py` | Showcase type-safe access and results      |
+| `features/zmq_notifications.py` | Decoded ZMQ block/tx notifications         |
+| `asset_operations.py`    | Asset transfers and issuance                   |
+| `basic_queries.py`       | Query blockchain data (blocks, balance, etc)   |
+| `cookie_auth.py`         | Authentication using .cookie file              |
+| `async_example.py`       | Async API interaction                          |
+| `test_cookie_auth.py`    | Auth unit test with .cookie                    |
+| `zmq_auto_decode.py`     | Deep decoding of tx/block via ZMQ              |
 
-The asset swap platform example demonstrates how to build a decentralized exchange for Evrmore assets using the `evrmore-rpc` package.
+---
 
-### Simple Swap
+## ✅ Requirements
+
+- Python 3.8 or higher
+- Evrmore daemon with RPC and optional ZMQ enabled
+
+---
+
+## 🪪 License
+
+MIT — See [LICENSE](LICENSE)
+
+---
+
+## 🤝 Contributing
+
+PRs welcome!
+
+```bash
+git clone https://github.com/manticoretechnologies/evrmore-rpc-dev
+cd evrmore-rpc
+python3 -m venv .venv && source .venv/bin/activate
+pip install -e .[dev]
+```
+
+Run tests:
+
+```bash
+python3 -m evrmore_rpc.stress_test
+```
+
+---
+
+## 🧭 Summary
+
+`evrmore-rpc` is a production-grade toolkit for Evrmore developers. Whether you're building block explorers, trading platforms, indexers, or decentralized tools, it's engineered to deliver speed, type-safety, real-time insight, and robust integration with the Evrmore chain.
+
+# Code Examples
+
+This guide provides practical examples of using the `evrmore-rpc` package for common blockchain operations.
+
+## Basic Usage
+
+### Initialize Client
 
 ```python
-import asyncio
-from decimal import Decimal
-from evrmore_rpc import EvrmoreRPCClient
+from evrmore_rpc import EvrmoreClient
 
-class AssetSwap:
+# Basic initialization
+client = EvrmoreClient()
+
+# With custom configuration
+client = EvrmoreClient(
+    host="127.0.0.1",
+    port=8332,
+    username="rpcuser",
+    password="rpcpass",
+    ssl=True
+)
+```
+
+### Get Blockchain Info
+
+```python
+# Get basic blockchain info
+info = client.getblockchaininfo()
+print(f"Chain: {info.chain}")
+print(f"Blocks: {info.blocks}")
+print(f"Headers: {info.headers}")
+print(f"Best block hash: {info.bestblockhash}")
+print(f"Difficulty: {info.difficulty}")
+print(f"Verification progress: {info.verificationprogress}")
+```
+
+### Get Block Information
+
+```python
+# Get block by height
+block = client.getblock(1000)
+print(f"Block hash: {block.hash}")
+print(f"Previous block: {block.previousblockhash}")
+print(f"Time: {block.time}")
+print(f"Transactions: {len(block.tx)}")
+
+# Get block by hash
+block = client.getblock("0000000000000000000000000000000000000000000000000000000000000000")
+```
+
+### Get Transaction Information
+
+```python
+# Get transaction by ID
+tx = client.getrawtransaction("txid", True)
+print(f"Transaction ID: {tx.txid}")
+print(f"Version: {tx.version}")
+print(f"Size: {tx.size}")
+print(f"Inputs: {len(tx.vin)}")
+print(f"Outputs: {len(tx.vout)}")
+
+# Get transaction details
+for vin in tx.vin:
+    print(f"Input: {vin.txid}:{vin.vout}")
+    print(f"Sequence: {vin.sequence}")
+
+for vout in tx.vout:
+    print(f"Output value: {vout.value}")
+    print(f"Script: {vout.scriptPubKey.hex}")
+```
+
+## Asset Operations
+
+### Get Asset Information
+
+```python
+# Get asset info
+asset = client.getassetinfo("ASSET_NAME")
+print(f"Asset name: {asset.name}")
+print(f"Amount: {asset.amount}")
+print(f"Units: {asset.units}")
+print(f"Reissuable: {asset.reissuable}")
+print(f"Has IPFS: {asset.has_ipfs}")
+if asset.has_ipfs:
+    print(f"IPFS hash: {asset.ipfs_hash}")
+```
+
+### Transfer Assets
+
+```python
+# Create asset transfer
+txid = client.transferasset(
+    "ASSET_NAME",
+    "DESTINATION_ADDRESS",
+    1.0,  # amount
+    "COMMENT",
+    "COMMENT_TO"
+)
+print(f"Transfer transaction ID: {txid}")
+```
+
+## Real-Time Notifications
+
+### ZMQ Notifications
+
+```python
+from evrmore_rpc.zmq import EvrmoreZMQClient, ZMQTopic
+
+# Initialize ZMQ client
+zmq = EvrmoreZMQClient()
+
+# Register handlers
+@zmq.on(ZMQTopic.BLOCK)
+def handle_block(notification):
+    print(f"New block: {notification.height}")
+
+@zmq.on(ZMQTopic.TX)
+def handle_tx(notification):
+    print(f"New transaction: {notification.txid}")
+
+# Start the client
+zmq.start()
+```
+
+### WebSocket Notifications
+
+```python
+from evrmore_rpc.websocket import EvrmoreWebSocketClient, WebSocketTopic
+
+# Initialize WebSocket client
+ws = EvrmoreWebSocketClient()
+
+# Register handlers
+@ws.on(WebSocketTopic.BLOCK)
+def handle_block(notification):
+    print(f"New block: {notification.height}")
+
+@ws.on(WebSocketTopic.TX)
+def handle_tx(notification):
+    print(f"New transaction: {notification.txid}")
+
+# Start the client
+ws.start()
+```
+
+## Advanced Examples
+
+### Block Explorer
+
+```python
+class BlockExplorer:
     def __init__(self):
-        self.client = EvrmoreRPCClient()
+        self.client = EvrmoreClient()
+        self.blocks_processed = 0
+        self.transactions_processed = 0
         
-    def list_my_assets(self):
-        """List assets in my wallet."""
-        assets = self.client.listmyassets()
-        return assets
-        
-    def create_swap_offer(self, asset_offered, amount_offered, asset_wanted, amount_wanted):
-        """Create a swap offer."""
-        # In a real implementation, this would create a transaction or smart contract
-        print(f"Creating swap offer: {amount_offered} {asset_offered} for {amount_wanted} {asset_wanted}")
-        
-    def execute_swap(self, offer_id):
-        """Execute a swap offer."""
-        # In a real implementation, this would execute the transaction or smart contract
-        print(f"Executing swap offer {offer_id}")
-
-async def main():
-    swap = AssetSwap()
-    
-    # List my assets
-    assets = swap.list_my_assets()
-    print("My assets:")
-    for asset, amount in assets.items():
-        print(f"  {asset}: {amount}")
-    
-    # Create a swap offer
-    swap.create_swap_offer("ASSET_A", Decimal("10"), "ASSET_B", Decimal("20"))
-    
-    # Execute a swap offer
-    swap.execute_swap("offer_id")
-
-if __name__ == "__main__":
-    asyncio.run(main())
-```
-
-### Real-time Swap
-
-```python
-import asyncio
-import json
-from decimal import Decimal
-from evrmore_rpc import EvrmoreRPCClient
-from evrmore_rpc.zmq import EvrmoreZMQClient
-
-class RealTimeAssetSwap:
-    def __init__(self):
-        self.rpc_client = EvrmoreRPCClient()
-        self.zmq_client = EvrmoreZMQClient()
-        self.offers = []
-        
-    async def start(self):
-        """Start the swap platform."""
-        # Register ZMQ handlers
-        self.zmq_client.on_transaction(self.handle_transaction)
-        
-        # Start ZMQ client
-        await self.zmq_client.start()
-        
-    async def stop(self):
-        """Stop the swap platform."""
-        await self.zmq_client.stop()
-        
-    async def handle_transaction(self, notification):
-        """Handle a new transaction."""
-        txid = notification.hex
-        print(f"New transaction: {txid}")
+    def get_block_info(self, height):
+        block = self.client.getblock(height)
+        print(f"\nBlock #{height}")
+        print(f"Hash: {block.hash}")
+        print(f"Time: {block.time}")
+        print(f"Size: {block.size} bytes")
+        print(f"Transactions: {len(block.tx)}")
         
         # Get transaction details
-        tx = self.rpc_client.getrawtransaction(txid, True)
-        
-        # Check for asset transfers
-        for vout in tx.vout:
-            if "asset" in vout.get("scriptPubKey", {}).get("asset", {}):
-                asset = vout["scriptPubKey"]["asset"]
-                print(f"Asset transfer: {asset['name']} ({asset['amount']})")
-                
-                # Check if this transfer matches any of our offers
-                self.check_for_matching_offers(asset["name"], Decimal(str(asset["amount"])))
-    
-    def check_for_matching_offers(self, asset_name, amount):
-        """Check if an asset transfer matches any of our offers."""
-        for offer in self.offers:
-            if offer["status"] == "open" and offer["asset_wanted"] == asset_name and offer["amount_wanted"] == amount:
-                print(f"Found matching offer: {offer['id']}")
-                
-                # Execute the swap
-                self.execute_swap(offer["id"])
-    
-    def create_swap_offer(self, asset_offered, amount_offered, asset_wanted, amount_wanted):
-        """Create a swap offer."""
-        offer_id = f"offer_{len(self.offers)}"
-        offer = {
-            "id": offer_id,
-            "asset_offered": asset_offered,
-            "amount_offered": amount_offered,
-            "asset_wanted": asset_wanted,
-            "amount_wanted": amount_wanted,
-            "status": "open"
-        }
-        self.offers.append(offer)
-        print(f"Created swap offer: {offer_id}")
-        return offer_id
-    
-    def execute_swap(self, offer_id):
-        """Execute a swap offer."""
-        for offer in self.offers:
-            if offer["id"] == offer_id and offer["status"] == "open":
-                print(f"Executing swap offer: {offer_id}")
-                
-                # In a real implementation, this would execute the transaction
-                offer["status"] = "completed"
-                print(f"Swap offer {offer_id} completed")
-                return True
-        
-        print(f"Swap offer {offer_id} not found or not open")
-        return False
-
-async def main():
-    swap = RealTimeAssetSwap()
-    
-    # Start the swap platform
-    await swap.start()
-    
-    # Create a swap offer
-    offer_id = swap.create_swap_offer("ASSET_A", Decimal("10"), "ASSET_B", Decimal("20"))
-    
-    # Keep running until interrupted
-    try:
-        while True:
-            await asyncio.sleep(1)
-    finally:
-        await swap.stop()
-
-if __name__ == "__main__":
-    asyncio.run(main())
+        for txid in block.tx:
+            tx = self.client.getrawtransaction(txid, True)
+            print(f"\nTransaction: {txid}")
+            print(f"Size: {tx.size} bytes")
+            print(f"Inputs: {len(tx.vin)}")
+            print(f"Outputs: {len(tx.vout)}")
+            
+            # Check for asset transfers
+            for vout in tx.vout:
+                if "asset" in vout.get("scriptPubKey", {}).get("asset", {}):
+                    asset = vout["scriptPubKey"]["asset"]
+                    print(f"Asset transfer: {asset['name']} ({asset['amount']})")
 ```
 
-## Balance Tracker
-
-The balance tracker example demonstrates how to track asset balances in real-time using the `evrmore-rpc` package.
+### Asset Tracker
 
 ```python
-import asyncio
-from decimal import Decimal
-from evrmore_rpc import EvrmoreRPCClient
-from evrmore_rpc.zmq import EvrmoreZMQClient
-
-class BalanceTracker:
+class AssetTracker:
     def __init__(self):
-        self.rpc_client = EvrmoreRPCClient()
-        self.zmq_client = EvrmoreZMQClient()
-        self.balances = {}
-        self.addresses = []
+        self.client = EvrmoreClient()
+        self.assets = {}
         
-    async def start(self):
-        """Start the balance tracker."""
-        # Register ZMQ handlers
-        self.zmq_client.on_transaction(self.handle_transaction)
-        
-        # Start ZMQ client
-        await self.zmq_client.start()
-        
-    async def stop(self):
-        """Stop the balance tracker."""
-        await self.zmq_client.stop()
-        
-    def add_address(self, address):
-        """Add an address to track."""
-        self.addresses.append(address)
-        
-        # Get current balances
-        balances = self.rpc_client.getaddressbalance({"addresses": [address]})
-        
-        # Store balances
-        self.balances[address] = {
-            "EVR": Decimal(str(balances["balance"] / 100000000)),
-            "assets": {}
+    def track_asset(self, asset_name):
+        # Get asset info
+        asset = self.client.getassetinfo(asset_name)
+        self.assets[asset_name] = {
+            "name": asset.name,
+            "amount": asset.amount,
+            "units": asset.units,
+            "reissuable": asset.reissuable,
+            "transfers": []
         }
         
-        # Get asset balances
-        assets = self.rpc_client.getaddressutxos({"addresses": [address]})
-        for utxo in assets:
-            if "asset" in utxo:
-                asset_name = utxo["asset"]["name"]
-                asset_amount = Decimal(str(utxo["asset"]["amount"]))
+    def get_asset_transfers(self, asset_name, start_block=0):
+        if asset_name not in self.assets:
+            self.track_asset(asset_name)
+            
+        current_height = self.client.getblockcount()
+        
+        for height in range(start_block, current_height + 1):
+            block = self.client.getblock(height)
+            
+            for txid in block.tx:
+                tx = self.client.getrawtransaction(txid, True)
                 
-                if asset_name in self.balances[address]["assets"]:
-                    self.balances[address]["assets"][asset_name] += asset_amount
-                else:
-                    self.balances[address]["assets"][asset_name] = asset_amount
-        
-        print(f"Added address: {address}")
-        print(f"  EVR balance: {self.balances[address]['EVR']}")
-        print(f"  Asset balances: {self.balances[address]['assets']}")
-        
-    async def handle_transaction(self, notification):
-        """Handle a new transaction."""
-        txid = notification.hex
-        
-        # Get transaction details
-        tx = self.rpc_client.getrawtransaction(txid, True)
-        
-        # Check for transfers to/from tracked addresses
-        for vout in tx.vout:
-            if "addresses" in vout.get("scriptPubKey", {}):
-                for address in vout["scriptPubKey"]["addresses"]:
-                    if address in self.addresses:
-                        # Update EVR balance
-                        amount = Decimal(str(vout["value"]))
-                        self.balances[address]["EVR"] += amount
-                        print(f"Updated EVR balance for {address}: {self.balances[address]['EVR']}")
-                        
-                        # Update asset balance
-                        if "asset" in vout.get("scriptPubKey", {}):
-                            asset = vout["scriptPubKey"]["asset"]
-                            asset_name = asset["name"]
-                            asset_amount = Decimal(str(asset["amount"]))
-                            
-                            if asset_name in self.balances[address]["assets"]:
-                                self.balances[address]["assets"][asset_name] += asset_amount
-                            else:
-                                self.balances[address]["assets"][asset_name] = asset_amount
-                                
-                            print(f"Updated asset balance for {address}: {asset_name} = {self.balances[address]['assets'][asset_name]}")
-        
-        # Check for transfers from tracked addresses
-        for vin in tx.vin:
-            if "txid" in vin and "vout" in vin:
-                prev_tx = self.rpc_client.getrawtransaction(vin["txid"], True)
-                prev_vout = prev_tx.vout[vin["vout"]]
-                
-                if "addresses" in prev_vout.get("scriptPubKey", {}):
-                    for address in prev_vout["scriptPubKey"]["addresses"]:
-                        if address in self.addresses:
-                            # Update EVR balance
-                            amount = Decimal(str(prev_vout["value"]))
-                            self.balances[address]["EVR"] -= amount
-                            print(f"Updated EVR balance for {address}: {self.balances[address]['EVR']}")
-                            
-                            # Update asset balance
-                            if "asset" in prev_vout.get("scriptPubKey", {}):
-                                asset = prev_vout["scriptPubKey"]["asset"]
-                                asset_name = asset["name"]
-                                asset_amount = Decimal(str(asset["amount"]))
-                                
-                                if asset_name in self.balances[address]["assets"]:
-                                    self.balances[address]["assets"][asset_name] -= asset_amount
-                                    print(f"Updated asset balance for {address}: {asset_name} = {self.balances[address]['assets'][asset_name]}")
-
-async def main():
-    tracker = BalanceTracker()
-    
-    # Start the balance tracker
-    await tracker.start()
-    
-    # Add addresses to track
-    tracker.add_address("EVRxxxxxxxxxxxxxxxxxxxxxxxxxxxxx")
-    tracker.add_address("EVRyyyyyyyyyyyyyyyyyyyyyyyyyyyyy")
-    
-    # Keep running until interrupted
-    try:
-        while True:
-            await asyncio.sleep(1)
-    finally:
-        await tracker.stop()
-
-if __name__ == "__main__":
-    asyncio.run(main())
+                for vout in tx.vout:
+                    if "asset" in vout.get("scriptPubKey", {}).get("asset", {}):
+                        asset = vout["scriptPubKey"]["asset"]
+                        if asset["name"] == asset_name:
+                            self.assets[asset_name]["transfers"].append({
+                                "txid": txid,
+                                "amount": asset["amount"],
+                                "block": height,
+                                "time": block.time
+                            })
 ```
 
-## Interactive Dashboard
-
-The interactive dashboard example demonstrates how to build a real-time dashboard for monitoring the Evrmore blockchain using the `evrmore-rpc` package.
+### Transaction Monitor
 
 ```python
-import asyncio
-import datetime
-from rich.console import Console
-from rich.table import Table
-from rich.panel import Panel
-from rich.layout import Layout
-from rich.live import Live
-from evrmore_rpc import EvrmoreRPCClient
-from evrmore_rpc.zmq import EvrmoreZMQClient
-
-class EvrmoreMonitor:
+class TransactionMonitor:
     def __init__(self):
-        self.rpc_client = EvrmoreRPCClient()
-        self.zmq_client = EvrmoreZMQClient()
-        self.console = Console()
-        self.layout = Layout()
-        self.recent_blocks = []
-        self.recent_transactions = []
-        self.mempool_stats = {"size": 0, "bytes": 0, "usage": 0}
-        self.network_stats = {"connections": 0, "version": "", "subversion": "", "protocolversion": 0}
-        self.blockchain_stats = {"blocks": 0, "headers": 0, "difficulty": 0, "chain": ""}
+        self.client = EvrmoreClient()
+        self.watched_addresses = set()
+        self.transactions = {}
         
-    async def start(self):
-        """Start the monitor."""
-        # Register ZMQ handlers
-        self.zmq_client.on_block(self.handle_block)
-        self.zmq_client.on_transaction(self.handle_transaction)
+    def watch_address(self, address):
+        self.watched_addresses.add(address)
         
-        # Start ZMQ client
-        await self.zmq_client.start()
-        
-        # Initialize data
-        await self.update_blockchain_stats()
-        await self.update_network_stats()
-        await self.update_mempool_stats()
-        await self.update_recent_blocks()
-        
-    async def stop(self):
-        """Stop the monitor."""
-        await self.zmq_client.stop()
-        
-    async def handle_block(self, notification):
-        """Handle a new block."""
-        block_hash = notification.hex
-        
-        # Get block details
-        block = self.rpc_client.getblock(block_hash)
-        
-        # Add to recent blocks
-        self.recent_blocks.insert(0, {
-            "hash": block.hash,
-            "height": block.height,
-            "time": datetime.datetime.fromtimestamp(block.time),
-            "txs": len(block.tx),
-            "size": block.size
-        })
-        
-        # Keep only the 10 most recent blocks
-        self.recent_blocks = self.recent_blocks[:10]
-        
-        # Update stats
-        await self.update_blockchain_stats()
-        await self.update_mempool_stats()
-        
-    async def handle_transaction(self, notification):
-        """Handle a new transaction."""
-        txid = notification.hex
-        
-        # Get transaction details
-        try:
-            tx = self.rpc_client.getrawtransaction(txid, True)
+    def get_address_transactions(self, address):
+        if address not in self.watched_addresses:
+            self.watch_address(address)
             
-            # Add to recent transactions
-            self.recent_transactions.insert(0, {
-                "txid": tx.txid,
-                "size": tx.size,
-                "vsize": tx.vsize,
-                "time": datetime.datetime.now(),
-                "inputs": len(tx.vin),
-                "outputs": len(tx.vout)
-            })
-            
-            # Keep only the 10 most recent transactions
-            self.recent_transactions = self.recent_transactions[:10]
-            
-            # Update mempool stats
-            await self.update_mempool_stats()
-        except:
-            # Transaction might not be in mempool yet
-            pass
+        # Get all transactions for address
+        txs = self.client.getaddresstxids({"addresses": [address]})
         
-    async def update_blockchain_stats(self):
-        """Update blockchain statistics."""
-        info = self.rpc_client.getblockchaininfo()
-        self.blockchain_stats = {
-            "blocks": info.blocks,
-            "headers": info.headers,
-            "difficulty": info.difficulty,
-            "chain": info.chain
-        }
-        
-    async def update_network_stats(self):
-        """Update network statistics."""
-        info = self.rpc_client.getnetworkinfo()
-        self.network_stats = {
-            "connections": info.connections,
-            "version": info.version,
-            "subversion": info.subversion,
-            "protocolversion": info.protocolversion
-        }
-        
-    async def update_mempool_stats(self):
-        """Update mempool statistics."""
-        info = self.rpc_client.getmempoolinfo()
-        self.mempool_stats = {
-            "size": info["size"],
-            "bytes": info["bytes"],
-            "usage": info["usage"]
-        }
-        
-    async def update_recent_blocks(self):
-        """Update recent blocks."""
-        # Get current block height
-        height = self.rpc_client.getblockcount()
-        
-        # Get the 10 most recent blocks
-        for i in range(height, max(0, height - 10), -1):
-            block_hash = self.rpc_client.getblockhash(i)
-            block = self.rpc_client.getblock(block_hash)
-            
-            self.recent_blocks.append({
-                "hash": block.hash,
-                "height": block.height,
-                "time": datetime.datetime.fromtimestamp(block.time),
-                "txs": len(block.tx),
-                "size": block.size
-            })
-        
-    def render_dashboard(self):
-        """Render the dashboard."""
-        self.layout.split(
-            Layout(name="header", size=3),
-            Layout(name="main"),
-            Layout(name="footer", size=3)
-        )
-        
-        self.layout["main"].split_row(
-            Layout(name="left"),
-            Layout(name="right")
-        )
-        
-        self.layout["left"].split(
-            Layout(name="blockchain", size=10),
-            Layout(name="blocks")
-        )
-        
-        self.layout["right"].split(
-            Layout(name="network", size=10),
-            Layout(name="mempool", size=10),
-            Layout(name="transactions")
-        )
-        
-        # Header
-        self.layout["header"].update(
-            Panel(
-                f"Evrmore Blockchain Monitor - {datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')}",
-                style="bold white on blue"
-            )
-        )
-        
-        # Blockchain stats
-        blockchain_table = Table(title="Blockchain Stats")
-        blockchain_table.add_column("Stat")
-        blockchain_table.add_column("Value")
-        blockchain_table.add_row("Chain", self.blockchain_stats["chain"])
-        blockchain_table.add_row("Blocks", str(self.blockchain_stats["blocks"]))
-        blockchain_table.add_row("Headers", str(self.blockchain_stats["headers"]))
-        blockchain_table.add_row("Difficulty", f"{self.blockchain_stats['difficulty']:.8f}")
-        self.layout["blockchain"].update(blockchain_table)
-        
-        # Network stats
-        network_table = Table(title="Network Stats")
-        network_table.add_column("Stat")
-        network_table.add_column("Value")
-        network_table.add_row("Connections", str(self.network_stats["connections"]))
-        network_table.add_row("Version", str(self.network_stats["version"]))
-        network_table.add_row("Subversion", self.network_stats["subversion"])
-        network_table.add_row("Protocol", str(self.network_stats["protocolversion"]))
-        self.layout["network"].update(network_table)
-        
-        # Mempool stats
-        mempool_table = Table(title="Mempool Stats")
-        mempool_table.add_column("Stat")
-        mempool_table.add_column("Value")
-        mempool_table.add_row("Transactions", str(self.mempool_stats["size"]))
-        mempool_table.add_row("Size", f"{self.mempool_stats['bytes'] / 1024 / 1024:.2f} MB")
-        mempool_table.add_row("Memory Usage", f"{self.mempool_stats['usage'] / 1024 / 1024:.2f} MB")
-        self.layout["mempool"].update(mempool_table)
-        
-        # Recent blocks
-        blocks_table = Table(title="Recent Blocks")
-        blocks_table.add_column("Height")
-        blocks_table.add_column("Hash")
-        blocks_table.add_column("Time")
-        blocks_table.add_column("Txs")
-        blocks_table.add_column("Size")
-        
-        for block in self.recent_blocks:
-            blocks_table.add_row(
-                str(block["height"]),
-                block["hash"][:10] + "...",
-                block["time"].strftime("%H:%M:%S"),
-                str(block["txs"]),
-                f"{block['size'] / 1024:.2f} KB"
-            )
-            
-        self.layout["blocks"].update(blocks_table)
-        
-        # Recent transactions
-        txs_table = Table(title="Recent Transactions")
-        txs_table.add_column("TxID")
-        txs_table.add_column("Time")
-        txs_table.add_column("Size")
-        txs_table.add_column("Inputs")
-        txs_table.add_column("Outputs")
-        
-        for tx in self.recent_transactions:
-            txs_table.add_row(
-                tx["txid"][:10] + "...",
-                tx["time"].strftime("%H:%M:%S"),
-                f"{tx['size']} bytes",
-                str(tx["inputs"]),
-                str(tx["outputs"])
-            )
-            
-        self.layout["transactions"].update(txs_table)
-        
-        # Footer
-        self.layout["footer"].update(
-            Panel(
-                "Press Ctrl+C to exit",
-                style="bold white on blue"
-            )
-        )
-        
-        return self.layout
-
-async def main():
-    monitor = EvrmoreMonitor()
-    
-    # Start the monitor
-    await monitor.start()
-    
-    # Create a live display
-    with Live(monitor.render_dashboard(), refresh_per_second=1) as live:
-        try:
-            while True:
-                # Update the display
-                live.update(monitor.render_dashboard())
+        for txid in txs:
+            if txid not in self.transactions:
+                tx = self.client.getrawtransaction(txid, True)
+                self.transactions[txid] = {
+                    "txid": txid,
+                    "time": tx.time,
+                    "inputs": [],
+                    "outputs": []
+                }
                 
-                # Wait a bit
-                await asyncio.sleep(1)
-        finally:
-            await monitor.stop()
+                # Process inputs
+                for vin in tx.vin:
+                    if "coinbase" not in vin:
+                        prev_tx = self.client.getrawtransaction(vin.txid, True)
+                        prev_vout = prev_tx.vout[vin.vout]
+                        self.transactions[txid]["inputs"].append({
+                            "address": prev_vout.scriptPubKey.addresses[0],
+                            "amount": prev_vout.value
+                        })
+                
+                # Process outputs
+                for vout in tx.vout:
+                    if "addresses" in vout.scriptPubKey:
+                        self.transactions[txid]["outputs"].append({
+                            "address": vout.scriptPubKey.addresses[0],
+                            "amount": vout.value
+                        })
+```
 
-if __name__ == "__main__":
-    asyncio.run(main()) 
+## Error Handling
+
+```python
+from evrmore_rpc import EvrmoreRPCError
+
+try:
+    # Make RPC call
+    result = client.getblockchaininfo()
+except EvrmoreRPCError as e:
+    print(f"RPC error: {e}")
+except Exception as e:
+    print(f"Unexpected error: {e}")
+```
+
+## Performance Optimization
+
+```python
+# Use connection pooling
+from evrmore_rpc import EvrmoreClient, ConnectionPool
+
+# Create connection pool
+pool = ConnectionPool(
+    host="127.0.0.1",
+    port=8332,
+    username="rpcuser",
+    password="rpcpass",
+    max_connections=10
+)
+
+# Get client from pool
+client = pool.get_client()
+
+# Use client
+result = client.getblockchaininfo()
+
+# Return client to pool
+pool.return_client(client)
+
+# Batch process blocks
+def process_blocks(start_height, end_height):
+    for height in range(start_height, end_height + 1):
+        block = client.getblock(height)
+        # Process block data
+```
+
+## See Also
+
+- [Getting Started](getting-started.md) for basic usage
+- [API Reference](api-reference.md) for detailed API docs
+- [ZMQ Guide](zmq.md) for real-time notifications
+- [WebSocket Guide](websockets.md) for WebSocket integration
+- [Advanced Usage](advanced.md) for production patterns

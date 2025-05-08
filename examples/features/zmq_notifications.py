@@ -6,16 +6,21 @@
 This example demonstrates how to use the `EvrmoreZMQClient` to receive real-time
 blockchain notifications from an Evrmore node via ZeroMQ.
 
-Evrmore supports several notification topics including:
-- HASH_BLOCK: Block hashes
-- HASH_TX: Transaction hashes
-- BLOCK: Fully decoded blocks (requires RPC)
-- TX: Fully decoded transactions (requires RPC)
+Features:
+- Automatic context detection (sync/async)
+- Enhanced asset metadata in decoded transactions
+- Automatic reconnection on connection loss
+- Clean shutdown and resource management
+- Typed notification data with structured fields
+- Seamless API that works in both sync and async contexts
 
-This example:
-1. Subscribes to all enhanced topics (BLOCK, TX)
-2. Uses a provided RPC client to decode notification payloads
-3. Shows both block and transaction information
+Available Topics:
+- HASH_BLOCK: Block hash notifications
+- HASH_TX: Transaction hash notifications
+- RAW_BLOCK: Raw serialized block data
+- RAW_TX: Raw serialized transaction data
+- BLOCK: Auto-decoded block data (requires RPC)
+- TX: Auto-decoded transaction data (requires RPC)
 
 ✅ Requires `zmqpub*` entries in your `evrmore.conf`:
     zmqpubhashblock=tcp://127.0.0.1:28332
@@ -32,12 +37,13 @@ from evrmore_rpc.zmq import EvrmoreZMQClient, ZMQTopic
 # Create a synchronous RPC client
 rpc = EvrmoreClient()
 
-# Create a ZMQ client, requesting decoded data for enhanced topics
+# Create a ZMQ client with auto-decoding enabled
 zmq = EvrmoreZMQClient(
     zmq_host="127.0.0.1",
     zmq_port=28332,
     topics=[ZMQTopic.BLOCK, ZMQTopic.TX],
-    rpc_client=rpc
+    rpc_client=rpc,
+    auto_decode=True
 )
 
 # Subscribe to decoded blocks
@@ -47,23 +53,54 @@ def handle_block(notification):
     print(f"  ➤ Block height: {notification.height}")
     print(f"  ➤ Hash: {notification.hex}")
     print(f"  ➤ Transactions: {len(notification.block['tx'])}")
+    
+    # Access block data
+    block = notification.block
+    print(f"  ➤ Size: {block.get('size', 'N/A')} bytes")
+    print(f"  ➤ Time: {block.get('time', 'N/A')}")
+    print(f"  ➤ Difficulty: {block.get('difficulty', 'N/A')}")
 
 # Subscribe to decoded transactions
 @zmq.on(ZMQTopic.TX)
 def handle_tx(notification):
-    print("\n🔄 [Transaction Notification]")
+    print("\n💸 [Transaction Notification]")
     print(f"  ➤ TXID: {notification.tx['txid']}")
-    print(f"  ➤ Inputs: {len(notification.tx['vin'])}, Outputs: {len(notification.tx['vout'])}")
+    print(f"  ➤ Size: {notification.tx.get('size', 'N/A')} bytes")
+    print(f"  ➤ Version: {notification.tx.get('version', 'N/A')}")
+    
+    # Check for asset data
     if notification.has_assets:
-        print("  ➤ Contains asset operations:")
+        print("\n  📊 [Asset Information]")
         for asset in notification.asset_info:
-            print(f"    - {asset['asset_name']} ({asset['type']}) x{asset['amount']}")
+            print(f"    ➤ Asset: {asset.get('name', 'N/A')}")
+            print(f"    ➤ Amount: {asset.get('amount', 'N/A')}")
+            print(f"    ➤ Type: {asset.get('type', 'N/A')}")
 
-# Start listening for messages
-print("📡 Listening for ZMQ notifications... Press Ctrl+C to stop.")
-try:
-    zmq.start()  # Works in both sync and async
-    input("\n⏳ Press Enter to exit...\n")
-finally:
-    zmq.stop()
-    rpc.close_sync()
+# Start the ZMQ client
+# This will auto-detect if we're in an async context
+zmq.start()
+
+# For async usage:
+"""
+async def main():
+    zmq = EvrmoreZMQClient(
+        zmq_host="127.0.0.1",
+        zmq_port=28332,
+        topics=[ZMQTopic.BLOCK, ZMQTopic.TX],
+        rpc_client=rpc,
+        auto_decode=True
+    )
+    
+    @zmq.on(ZMQTopic.BLOCK)
+    async def handle_block(notification):
+        # Async handlers work too!
+        print(f"Block #{notification.height}")
+    
+    await zmq.start()
+    
+    # Keep running
+    while True:
+        await asyncio.sleep(1)
+
+asyncio.run(main())
+"""

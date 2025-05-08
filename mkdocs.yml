@@ -1,10 +1,10 @@
 site_name: Evrmore RPC
 site_description: A high-performance Python wrapper for Evrmore blockchain RPC commands with a seamless API
 site_author: Manticore Technology
-site_url: https://manticoretechnology.github.io/evrmore-rpc/
+site_url: https://manticoretechnologies.github.io/evrmore-rpc-dev/
 
-repo_name: ManticoreTechnology/evrmore-rpc
-repo_url: https://github.com/ManticoreTechnology/evrmore-rpc
+repo_name: ManticoreTechnologies/evrmore-rpc
+repo_url: https://github.com/ManticoreTechnologies/evrmore-rpc-dev
 edit_uri: edit/main/docs/
 
 theme:
@@ -101,7 +101,7 @@ plugins:
 extra:
   social:
     - icon: fontawesome/brands/github
-      link: https://github.com/ManticoreTechnology/evrmore-rpc
+      link: https://github.com/manticoretechnologies/evrmore-rpc-dev
     - icon: fontawesome/brands/python
       link: https://pypi.org/project/evrmore-rpc/
 

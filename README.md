@@ -15,7 +15,7 @@ A high-performance, fully featured Python client for the [Evrmore](https://evrmo
 - **💡 Smart RPC Handling**: Full method coverage with type hints and structured responses
 - **⚡ Fast + Efficient**: Connection pooling for low-latency concurrent RPC calls
 - **🧠 Asset Intelligence**: Auto-parses asset transactions with enhanced metadata
-- **📡 ZMQ Notifications**: Subscribe to real-time `BLOCK`, `TX`, `RAW_*`, `HASH_*` events
+- **📡 ZMQ Notifications**: Subscribe to real-time blockchain events with auto-decoding
 - **🧰 Fully Tested Utilities**: Stress test, coverage verification, pooling demo, and more
 
 ---
@@ -62,17 +62,29 @@ asyncio.run(main())
 # Default (evrmore.conf)
 client = EvrmoreClient()
 
-# Env vars (EVR_RPC_*)
+# Environment Variables
+# EVR_RPC_URL=http://localhost:8819
+# EVR_RPC_USER=user
+# EVR_RPC_PASSWORD=pass
+# EVR_RPC_PORT=8819
+# EVR_TESTNET=true
 client = EvrmoreClient()
 
-# Manual args
-client = EvrmoreClient(url="http://localhost:8819", rpcuser="user", rpcpassword="pass")
+# Manual Configuration
+client = EvrmoreClient(
+    url="http://localhost:8819",
+    rpcuser="user",
+    rpcpassword="pass",
+    rpcport=8819,
+    testnet=True,
+    timeout=30,
+    async_mode=None  # Auto-detect or force sync/async
+)
 
-# Testnet toggle
-client = EvrmoreClient(testnet=True)
+# Cookie Authentication
+# Automatically reads from ~/.evrmore/.cookie
+client = EvrmoreClient(datadir="~/.evrmore")
 ```
-
-Supports cookie authentication and auto-parsing of `.cookie` file.
 
 ---
 
@@ -85,6 +97,12 @@ print(info['amount'], info['reissuable'])
 
 # Transfer asset
 txid = client.transfer("MYTOKEN", 100, "EVRAddress")
+
+# Enhanced asset metadata in ZMQ notifications
+@zmq.on(ZMQTopic.TX)
+def tx_handler(note):
+    if note.has_assets:
+        print(f"Asset info: {note.asset_info}")
 ```
 
 ---
@@ -95,24 +113,58 @@ txid = client.transfer("MYTOKEN", 100, "EVRAddress")
 from evrmore_rpc import EvrmoreClient
 from evrmore_rpc.zmq import EvrmoreZMQClient, ZMQTopic
 
+# Create RPC client for auto-decoding
 rpc = EvrmoreClient()
-zmq = EvrmoreZMQClient(rpc_client=rpc)
 
+# Create ZMQ client with auto-decoding enabled
+zmq = EvrmoreZMQClient(
+    zmq_host="127.0.0.1",
+    zmq_port=28332,
+    topics=[ZMQTopic.BLOCK, ZMQTopic.TX],
+    rpc_client=rpc,
+    auto_decode=True
+)
+
+# Subscribe to decoded blocks
 @zmq.on(ZMQTopic.BLOCK)
 def block_handler(note):
-    print(f"Block #{note.height} with {len(note.block['tx'])} txs")
+    print(f"Block #{note.height}")
+    print(f"Hash: {note.hex}")
+    print(f"Transactions: {len(note.block['tx'])}")
 
+# Subscribe to decoded transactions
 @zmq.on(ZMQTopic.TX)
 def tx_handler(note):
-    print(f"TX {note.tx['txid']} has {note._vin_count} inputs")
+    print(f"TX {note.tx['txid']}")
+    if note.has_assets:
+        print(f"Asset info: {note.asset_info}")
 
+# Start in current context (sync/async)
 zmq.start()
 ```
 
-Supports:
-- `HASH_BLOCK`, `HASH_TX`, `RAW_BLOCK`, `RAW_TX`
-- `BLOCK`, `TX` (auto-decoded)
-- Asset metadata and event info on decoded transactions
+Available Topics:
+- `HASH_BLOCK`: Block hash notifications
+- `HASH_TX`: Transaction hash notifications
+- `RAW_BLOCK`: Raw serialized block data
+- `RAW_TX`: Raw serialized transaction data
+- `BLOCK`: Auto-decoded block data (requires RPC)
+- `TX`: Auto-decoded transaction data (requires RPC)
+
+Features:
+- Automatic context detection (sync/async)
+- Enhanced asset metadata in decoded transactions
+- Automatic reconnection on connection loss
+- Clean shutdown and resource management
+- Typed notification data with structured fields
+
+Required evrmore.conf settings:
+```
+zmqpubhashblock=tcp://127.0.0.1:28332
+zmqpubhashtx=tcp://127.0.0.1:28332
+zmqpubrawblock=tcp://127.0.0.1:28332
+zmqpubrawtx=tcp://127.0.0.1:28332
+```
 
 ---
 
@@ -131,12 +183,15 @@ Tested on local node and remote RPC endpoint:
 
 ## 🔬 Examples & Utilities
 
-- `readme_test.py` — basic client usage
-- `stress_test.py` — performance benchmarking, concurrency tests
-- `connection_pooling.py` — pooled connections for sync/async
-- `flexible_config.py` — shows all configuration options
-- `rpc_coverage.py` — full method coverage checker
-- `zmq_notifications.py` — live decoded transaction/block stream
+- `basic_queries.py` — basic client usage
+- `async_example.py` — async client usage
+- `asset_operations.py` — asset management
+- `zmq_auto_decode_example.py` — ZMQ with auto-decoding
+- `cookie_auth.py` — cookie authentication
+- `stress_test.py` — performance benchmarking
+- `connection_pooling.py` — pooled connections
+- `flexible_config.py` — configuration options
+- `complete_rpc_coverage.py` — method coverage checker
 
 Run with:
 ```bash
