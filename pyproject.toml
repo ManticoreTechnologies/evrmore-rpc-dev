@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "evrmore-rpc"
-version = "4.0.2"
+version = "4.0.3"
 description = "A high-performance Python wrapper for Evrmore blockchain RPC commands with a seamless API"
 readme = "README.md"
 requires-python = ">=3.8"
@@ -73,7 +73,7 @@ all = [
 
 
 [project.urls]
-Homepage = "https://github.com/ManticoreTechnologies/evrmore-rpc-dev"
+Homepage = "https://manticore.technology"
 Documentation = "https://manticoretechnologies.github.io/evrmore-rpc-dev/"
 Repository = "https://github.com/ManticoreTechnologies/evrmore-rpc-dev.git"
 Issues = "https://github.com/ManticoreTechnologies/evrmore-rpc-dev/issues"
