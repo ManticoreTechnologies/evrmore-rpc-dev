@@ -1,0 +1,1650 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Discord Clone</title>
+  <style>
+    :root {
+      --discord-bg: #36393f;
+      --discord-sidebar: #2f3136;
+      --discord-server-list: #202225;
+      --discord-message-hover: #32353b;
+      --discord-text: #dcddde;
+      --discord-muted-text: #72767d;
+      --discord-input-bg: #40444b;
+      --discord-input-border: #222428;
+      --discord-accent: #5865f2;
+      --discord-accent-hover: #4752c4;
+      --discord-danger: #ed4245;
+      --discord-success: #3ba55d;
+      --discord-gray: #b9bbbe;
+      --discord-divider: rgba(79, 84, 92, 0.48);
+      --discord-channel: #8e9297;
+      --discord-channel-active: #fff;
+      --discord-channel-hover: #dcddde;
+    }
+    
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: "Whitney", "Helvetica Neue", Helvetica, Arial, sans-serif;
+      background-color: var(--discord-bg);
+      color: var(--discord-text);
+      display: flex;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    .server-list {
+      width: 72px;
+      background-color: var(--discord-server-list);
+      height: 100vh;
+      overflow-y: auto;
+      padding: 12px 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      flex-shrink: 0;
+    }
+
+    .server-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background-color: var(--discord-sidebar);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 8px;
+      color: var(--discord-accent);
+      font-size: 18px;
+      cursor: pointer;
+      transition: border-radius 0.2s;
+      position: relative;
+    }
+
+    .server-icon.active {
+      border-radius: 16px;
+      background-color: var(--discord-accent);
+      color: #fff;
+    }
+
+    .server-icon:hover:not(.active) {
+      border-radius: 16px;
+      background-color: var(--discord-accent);
+      color: #fff;
+    }
+
+    .server-icon.home {
+      margin-bottom: 16px;
+    }
+
+    .server-icon.add {
+      background-color: var(--discord-sidebar);
+      color: var(--discord-success);
+      font-size: 24px;
+    }
+
+    .server-divider {
+      height: 2px;
+      width: 32px;
+      background-color: var(--discord-divider);
+      margin: 8px 0;
+    }
+
+    .channels-container {
+      width: 240px;
+      background-color: var(--discord-sidebar);
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      flex-shrink: 0;
+    }
+
+    .server-header {
+      height: 48px;
+      padding: 0 16px;
+      display: flex;
+      align-items: center;
+      box-shadow: 0 1px 0 rgba(4, 4, 5, 0.2);
+      font-weight: bold;
+    }
+
+    .channel-list {
+      flex-grow: 1;
+      overflow-y: auto;
+      padding: 8px 0;
+    }
+
+    .channel-category {
+      padding: 8px 8px 0 16px;
+      color: var(--discord-muted-text);
+      font-size: 12px;
+      font-weight: 600;
+      text-transform: uppercase;
+    }
+
+    .channel {
+      padding: 6px 8px 6px 12px;
+      margin: 2px 0 2px 8px;
+      border-radius: 4px;
+      color: var(--discord-channel);
+      display: flex;
+      align-items: center;
+      cursor: pointer;
+    }
+
+    .channel.active {
+      background-color: var(--discord-message-hover);
+      color: var(--discord-channel-active);
+    }
+
+    .channel:hover:not(.active) {
+      background-color: rgba(79, 84, 92, 0.16);
+      color: var(--discord-channel-hover);
+    }
+
+    .channel-icon {
+      margin-right: 6px;
+      font-size: 20px;
+      width: 20px;
+      text-align: center;
+    }
+
+    .user-controls {
+      height: 52px;
+      padding: 0 8px;
+      display: flex;
+      align-items: center;
+      background-color: rgba(32, 34, 37, 0.3);
+    }
+
+    .user-avatar {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background-color: var(--discord-accent);
+      margin-right: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+    }
+
+    .user-info {
+      flex-grow: 1;
+    }
+
+    .username {
+      font-size: 14px;
+      font-weight: 600;
+    }
+
+    .user-status {
+      font-size: 12px;
+      color: var(--discord-muted-text);
+    }
+
+    .user-actions {
+      display: flex;
+      gap: 8px;
+    }
+
+    .user-action-icon {
+      color: var(--discord-gray);
+      cursor: pointer;
+      font-size: 20px;
+    }
+
+    .user-action-icon:hover {
+      color: var(--discord-text);
+    }
+
+    .chat-container {
+      flex-grow: 1;
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+    }
+
+    .chat-header {
+      height: 48px;
+      padding: 0 16px;
+      display: flex;
+      align-items: center;
+      box-shadow: 0 1px 0 rgba(4, 4, 5, 0.2);
+    }
+
+    .chat-header-icon {
+      margin-right: 6px;
+      font-size: 24px;
+      color: var(--discord-gray);
+    }
+
+    .chat-header-name {
+      font-weight: 600;
+    }
+
+    .chat-header-topic {
+      margin-left: 12px;
+      padding-left: 12px;
+      border-left: 1px solid var(--discord-divider);
+      color: var(--discord-muted-text);
+      font-size: 14px;
+    }
+
+    .chat-header-actions {
+      margin-left: auto;
+      display: flex;
+      gap: 16px;
+    }
+
+    .header-icon {
+      color: var(--discord-gray);
+      font-size: 22px;
+      cursor: pointer;
+    }
+
+    .header-icon:hover {
+      color: var(--discord-text);
+    }
+
+    #chat {
+      flex-grow: 1;
+      overflow-y: auto;
+      padding: 16px 0;
+      background-color: var(--discord-bg);
+    }
+
+    .message-container {
+      padding: 0 16px;
+      margin: 2px 0;
+      display: flex;
+      align-items: flex-start;
+    }
+
+    .message-container:hover {
+      background-color: var(--discord-message-hover);
+    }
+
+    .message-avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      margin-right: 16px;
+      background-color: var(--discord-accent);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+    }
+
+    .message-content {
+      flex-grow: 1;
+      padding: 2px 0;
+    }
+
+    .message-header {
+      display: flex;
+      align-items: baseline;
+      margin-bottom: 4px;
+    }
+
+    .message-author {
+      font-weight: 500;
+      margin-right: 8px;
+    }
+
+    .message-timestamp {
+      font-size: 0.75rem;
+      color: var(--discord-muted-text);
+    }
+
+    .message-text {
+      font-size: 16px;
+      line-height: 1.375;
+      white-space: pre-wrap;
+      word-wrap: break-word;
+    }
+
+    .file-message {
+      margin-top: 8px;
+      background-color: var(--discord-input-bg);
+      border-radius: 4px;
+      padding: 12px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .file-message .file-icon {
+      font-size: 24px;
+      margin-bottom: 8px;
+    }
+
+    .file-message .file-name {
+      font-weight: 500;
+      margin-bottom: 4px;
+    }
+
+    .file-message .file-size {
+      font-size: 0.8em;
+      color: var(--discord-muted-text);
+      margin-bottom: 8px;
+    }
+
+    .file-message .file-download {
+      background-color: var(--discord-accent);
+      color: white;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 3px;
+      cursor: pointer;
+      font-weight: 500;
+      align-self: flex-start;
+    }
+
+    .file-message .file-download:hover {
+      background-color: var(--discord-accent-hover);
+    }
+
+    .system-message {
+      padding: 8px 16px;
+      color: var(--discord-muted-text);
+      font-size: 14px;
+      font-style: italic;
+      text-align: center;
+    }
+
+    .chat-input-container {
+      padding: 0 16px 24px;
+    }
+
+    .chat-input-wrapper {
+      background-color: var(--discord-input-bg);
+      border-radius: 8px;
+      padding: 0 16px;
+      position: relative;
+    }
+
+    .input-attachments {
+      padding: 4px 0;
+      display: flex;
+      align-items: center;
+    }
+
+    .attachment-button {
+      color: var(--discord-gray);
+      font-size: 24px;
+      cursor: pointer;
+      margin-right: 16px;
+    }
+
+    .attachment-button:hover {
+      color: var(--discord-text);
+    }
+
+    #file-input {
+      display: none;
+    }
+
+    #message {
+      width: 100%;
+      background-color: transparent;
+      border: none;
+      padding: 12px 0;
+      color: var(--discord-text);
+      font-family: inherit;
+      font-size: 16px;
+    }
+
+    #message:focus {
+      outline: none;
+    }
+
+    #message::placeholder {
+      color: var(--discord-muted-text);
+    }
+
+    .progress-container {
+      height: 4px;
+      background-color: var(--discord-input-border);
+      border-radius: 2px;
+      margin-top: 4px;
+      margin-bottom: 8px;
+      overflow: hidden;
+      display: none;
+    }
+
+    .progress-bar {
+      height: 100%;
+      background-color: var(--discord-accent);
+      width: 0%;
+      transition: width 0.1s;
+    }
+
+    .members-container {
+      width: 240px;
+      background-color: var(--discord-sidebar);
+      height: 100vh;
+      flex-shrink: 0;
+    }
+
+    .members-header {
+      height: 48px;
+      padding: 0 16px;
+      display: flex;
+      align-items: center;
+      color: var(--discord-muted-text);
+      font-size: 12px;
+      font-weight: 600;
+      text-transform: uppercase;
+      box-shadow: 0 1px 0 rgba(4, 4, 5, 0.2);
+    }
+
+    .members-list {
+      padding: 16px 8px;
+      overflow-y: auto;
+      height: calc(100vh - 48px);
+    }
+
+    .member-group {
+      margin-bottom: 16px;
+    }
+
+    .member-group-name {
+      padding: 0 8px 8px;
+      color: var(--discord-muted-text);
+      font-size: 12px;
+      font-weight: 600;
+      text-transform: uppercase;
+    }
+
+    .member {
+      padding: 8px;
+      border-radius: 4px;
+      display: flex;
+      align-items: center;
+      cursor: pointer;
+    }
+
+    .member:hover {
+      background-color: var(--discord-message-hover);
+    }
+
+    .member-avatar {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background-color: var(--discord-accent);
+      margin-right: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+    }
+
+    .member-name {
+      font-size: 14px;
+      font-weight: 500;
+    }
+
+    .connection-container {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: rgba(0, 0, 0, 0.8);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+    }
+
+    .connection-modal {
+      background-color: var(--discord-sidebar);
+      width: 440px;
+      border-radius: 5px;
+      padding: 16px;
+    }
+
+    .connection-modal-header {
+      font-size: 24px;
+      font-weight: 600;
+      margin-bottom: 16px;
+      text-align: center;
+    }
+
+    .connection-modal-buttons {
+      display: flex;
+      gap: 16px;
+      margin-bottom: 16px;
+    }
+
+    .connection-modal-button {
+      flex: 1;
+      padding: 12px;
+      border-radius: 3px;
+      color: #fff;
+      font-weight: 500;
+      text-align: center;
+      cursor: pointer;
+    }
+
+    .host-button {
+      background-color: var(--discord-accent);
+    }
+
+    .host-button:hover {
+      background-color: var(--discord-accent-hover);
+    }
+
+    .join-button {
+      background-color: var(--discord-success);
+    }
+
+    .join-button:hover {
+      background-color: #339253;
+    }
+
+    .connection-code-input {
+      background-color: var(--discord-input-bg);
+      border: 1px solid var(--discord-input-border);
+      border-radius: 3px;
+      color: var(--discord-text);
+      padding: 10px;
+      width: 100%;
+      font-family: monospace;
+      margin-bottom: 16px;
+      resize: none;
+    }
+
+    .connection-code-input:focus {
+      outline: none;
+      border-color: var(--discord-accent);
+    }
+
+    .connect-button {
+      width: 100%;
+      padding: 12px;
+      border-radius: 3px;
+      background-color: var(--discord-accent);
+      color: #fff;
+      font-weight: 500;
+      text-align: center;
+      cursor: pointer;
+      margin-bottom: 16px;
+    }
+
+    .connect-button:hover {
+      background-color: var(--discord-accent-hover);
+    }
+
+    .copy-button {
+      display: none;
+      width: 100%;
+      padding: 12px;
+      border-radius: 3px;
+      background-color: var(--discord-success);
+      color: #fff;
+      font-weight: 500;
+      text-align: center;
+      cursor: pointer;
+      margin-bottom: 16px;
+    }
+
+    .copy-button:hover {
+      background-color: #339253;
+    }
+
+    .connection-status {
+      text-align: center;
+      color: var(--discord-muted-text);
+      font-style: italic;
+    }
+    
+    .audio-controls {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .audio-button {
+      background-color: transparent;
+      border: none;
+      color: var(--discord-gray);
+      cursor: pointer;
+      font-size: 20px;
+      border-radius: 50%;
+      width: 32px;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .audio-button:hover {
+      color: var(--discord-text);
+      background-color: rgba(79, 84, 92, 0.32);
+    }
+
+    .audio-button.muted {
+      color: var(--discord-danger);
+    }
+
+    .audio-levels {
+      display: none;
+    }
+
+    .debug-panel {
+      display: none;
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      background: var(--discord-server-list);
+      border-radius: 5px;
+      padding: 8px;
+      width: 300px;
+      max-height: 200px;
+      overflow-y: auto;
+      font-family: monospace;
+      font-size: 12px;
+      z-index: 100;
+    }
+
+    .debug-entry {
+      margin-bottom: 4px;
+      border-left: 2px solid var(--discord-accent);
+      padding-left: 6px;
+    }
+
+    .error-entry {
+      border-left-color: var(--discord-danger);
+    }
+  </style>
+</head>
+<body>
+  <div class="server-list">
+    <div class="server-icon home active">DM</div>
+    <div class="server-divider"></div>
+    <div class="server-icon">P2P</div>
+    <div class="server-icon add">+</div>
+  </div>
+
+  <div class="channels-container">
+    <div class="server-header">Direct Messages</div>
+    <div class="channel-list">
+      <div class="channel-category">Private Channels</div>
+      <div class="channel active">
+        <span class="channel-icon">#</span>
+        <span>secure-chat</span>
+      </div>
+      <div class="channel">
+        <span class="channel-icon">🔊</span>
+        <span>voice-channel</span>
+      </div>
+    </div>
+    <div class="user-controls">
+      <div class="user-avatar">U</div>
+      <div class="user-info">
+        <div class="username">User123</div>
+        <div class="user-status">Online</div>
+      </div>
+      <div class="user-actions">
+        <div class="audio-controls">
+          <button id="mic-toggle" class="audio-button">
+            <span>🎙️</span>
+          </button>
+          <button id="audio-toggle" class="audio-button">
+            <span>🔊</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="chat-container">
+    <div class="chat-header">
+      <span class="chat-header-icon">#</span>
+      <span class="chat-header-name">secure-chat</span>
+      <span class="chat-header-topic">Peer-to-peer encrypted chat</span>
+      <div class="chat-header-actions">
+        <span class="header-icon">🔍</span>
+        <span class="header-icon">📌</span>
+        <span class="header-icon">👥</span>
+        <span class="header-icon">⚙️</span>
+      </div>
+    </div>
+
+    <div id="chat">
+      <!-- Messages will be added here -->
+    </div>
+
+    <div class="chat-input-container">
+      <div class="chat-input-wrapper">
+        <div class="input-attachments">
+          <label for="file-input" class="attachment-button">+</label>
+          <input type="file" id="file-input" onchange="handleFileSelect()">
+          <span id="selected-file-name"></span>
+        </div>
+        <input id="message" placeholder="Message #secure-chat" autocomplete="off" disabled />
+        <div class="progress-container" id="progress-container">
+          <div class="progress-bar" id="progress-bar"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="members-container">
+    <div class="members-header">
+      Members — 2
+    </div>
+    <div class="members-list">
+      <div class="member-group">
+        <div class="member-group-name">Online — 2</div>
+        <div class="member">
+          <div class="member-avatar">U</div>
+          <div class="member-name">User123</div>
+        </div>
+        <div class="member">
+          <div class="member-avatar">P</div>
+          <div class="member-name">Peer456</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="connection-container" id="connection-container">
+    <div class="connection-modal">
+      <div class="connection-modal-header">Connect to Chat</div>
+      
+      <div class="connection-modal-buttons">
+        <div class="connection-modal-button host-button" id="create-btn" onclick="createConnection()">
+          Create Connection (Host)
+        </div>
+        <div class="connection-modal-button join-button" id="join-btn" onclick="joinConnection()">
+          Join Connection (Guest)
+        </div>
+      </div>
+      
+      <textarea id="local-code" class="connection-code-input" placeholder="Your connection code will appear here..." rows="3" readonly></textarea>
+      <textarea id="remote-code" class="connection-code-input" placeholder="Paste the other person's connection code here..." rows="3"></textarea>
+      
+      <div class="connect-button" id="connect-btn" onclick="connectWithCode()">Connect</div>
+      <div class="copy-button" id="copy-btn" onclick="copyConnectionCode()">Copy Connection Code</div>
+      
+      <div class="connection-status" id="connection-status">Ready to create or join a connection</div>
+    </div>
+  </div>
+
+  <div id="debug-panel" class="debug-panel"></div>
+
+  <script>
+    // DOM elements
+    const chatContainer = document.getElementById('chat');
+    const messageInput = document.getElementById('message');
+    const sendButton = document.getElementById('send-btn');
+    const connectionStatus = document.getElementById('connection-status');
+    const localCodeElement = document.getElementById('local-code');
+    const remoteCodeElement = document.getElementById('remote-code');
+    const createButton = document.getElementById('create-btn');
+    const joinButton = document.getElementById('join-btn');
+    const connectButton = document.getElementById('connect-btn');
+    const copyButton = document.getElementById('copy-btn');
+    const micToggleBtn = document.getElementById('mic-toggle');
+    const audioToggleBtn = document.getElementById('audio-toggle');
+    const audioLevelBar = document.getElementById('audio-level-bar');
+    const debugPanel = document.getElementById('debug-panel');
+    const fileInput = document.getElementById('file-input');
+    const selectedFileName = document.getElementById('selected-file-name');
+    const progressContainer = document.getElementById('progress-container');
+    const progressBar = document.getElementById('progress-bar');
+    const connectionContainer = document.getElementById('connection-container');
+    
+    // Connection state variables
+    let peer;
+    let dataChannel;
+    let localStream;
+    let remoteStream;
+    let audioContext;
+    let audioAnalyser;
+    let audioDataArray;
+    let audioLevelInterval;
+    let micMuted = false;
+    let audioMuted = false;
+    let debugPanelVisible = false;
+    let selectedFile = null;
+    let receiveBuffer = [];
+    let receivedSize = 0;
+    let fileInfo = null;
+    
+    // File transfer constants
+    const CHUNK_SIZE = 16384; // 16KB chunks for file transfer
+    
+    // Initialize the app
+    function init() {
+      // Set up event listeners
+      messageInput.addEventListener("keypress", e => {
+        if (e.key === "Enter") {
+          e.preventDefault();
+          sendMessage();
+        }
+      });
+      
+      // Start audio level visualization
+      startAudioLevelVisualization();
+      
+      // Log initialization
+      debugLog("Application initialized");
+    }
+    
+    // Debug logging
+    function debugLog(message, type = 'info') {
+      const timestamp = new Date().toLocaleTimeString();
+      const entry = document.createElement('div');
+      entry.className = 'debug-entry' + (type === 'error' ? ' error-entry' : '');
+      entry.innerHTML = `<span style="color:#999;">[${timestamp}]</span> ${message}`;
+      debugPanel.appendChild(entry);
+      debugPanel.scrollTop = debugPanel.scrollHeight;
+      
+      // Also log to console
+      console.log(`[${timestamp}] ${message}`);
+    }
+    
+    // Toggle debug panel visibility
+    function toggleDebugPanel() {
+      debugPanelVisible = !debugPanelVisible;
+      debugPanel.style.display = debugPanelVisible ? 'block' : 'none';
+    }
+    
+    // Audio visualization
+    function startAudioLevelVisualization() {
+      if (audioLevelInterval) clearInterval(audioLevelInterval);
+      
+      // We don't show constant audio visualization in Discord style
+      // But we'll keep the function for the actual audio processing
+      
+      audioLevelInterval = setInterval(() => {
+        if (!audioAnalyser || micMuted) {
+          return;
+        }
+        
+        if (!audioDataArray) return;
+        
+        audioAnalyser.getByteFrequencyData(audioDataArray);
+        let sum = 0;
+        for (let i = 0; i < audioDataArray.length; i++) {
+          sum += audioDataArray[i];
+        }
+        const average = sum / audioDataArray.length;
+        // Instead of updating a bar, we could update a voice indicator in the members list
+      }, 100);
+    }
+    
+    // Chat messages
+    function addMessage(text, type) {
+      // If it's a system message, use special styling
+      if (type === 'system') {
+        const messageDiv = document.createElement('div');
+        messageDiv.className = 'system-message';
+        messageDiv.textContent = text;
+        chatContainer.appendChild(messageDiv);
+      } else {
+        // For user messages, create Discord-like message containers
+        const container = document.createElement('div');
+        container.className = 'message-container';
+        
+        const avatar = document.createElement('div');
+        avatar.className = 'message-avatar';
+        avatar.textContent = type === 'me' ? 'U' : 'P';
+        
+        const content = document.createElement('div');
+        content.className = 'message-content';
+        
+        const header = document.createElement('div');
+        header.className = 'message-header';
+        
+        const author = document.createElement('span');
+        author.className = 'message-author';
+        author.textContent = type === 'me' ? 'User123' : 'Peer456';
+        
+        const timestamp = document.createElement('span');
+        timestamp.className = 'message-timestamp';
+        timestamp.textContent = new Date().toLocaleTimeString();
+        
+        const messageText = document.createElement('div');
+        messageText.className = 'message-text';
+        messageText.textContent = text;
+        
+        header.appendChild(author);
+        header.appendChild(timestamp);
+        content.appendChild(header);
+        content.appendChild(messageText);
+        
+        container.appendChild(avatar);
+        container.appendChild(content);
+        
+        chatContainer.appendChild(container);
+      }
+      
+      chatContainer.scrollTop = chatContainer.scrollHeight;
+    }
+    
+    // Add file message
+    function addFileMessage(fileData, isMyFile) {
+      const container = document.createElement('div');
+      container.className = 'message-container';
+      
+      const avatar = document.createElement('div');
+      avatar.className = 'message-avatar';
+      avatar.textContent = isMyFile ? 'U' : 'P';
+      
+      const content = document.createElement('div');
+      content.className = 'message-content';
+      
+      const header = document.createElement('div');
+      header.className = 'message-header';
+      
+      const author = document.createElement('span');
+      author.className = 'message-author';
+      author.textContent = isMyFile ? 'User123' : 'Peer456';
+      
+      const timestamp = document.createElement('span');
+      timestamp.className = 'message-timestamp';
+      timestamp.textContent = new Date().toLocaleTimeString();
+      
+      const fileDiv = document.createElement('div');
+      fileDiv.className = 'file-message';
+      
+      const iconSpan = document.createElement('span');
+      iconSpan.className = 'file-icon';
+      iconSpan.textContent = '📄';
+      
+      const nameDiv = document.createElement('div');
+      nameDiv.className = 'file-name';
+      nameDiv.textContent = fileData.name;
+      
+      const sizeDiv = document.createElement('div');
+      sizeDiv.className = 'file-size';
+      sizeDiv.textContent = formatFileSize(fileData.size);
+      
+      fileDiv.appendChild(iconSpan);
+      fileDiv.appendChild(nameDiv);
+      fileDiv.appendChild(sizeDiv);
+      
+      // For received files, add download button
+      if (!isMyFile && fileData.data) {
+        const downloadButton = document.createElement('button');
+        downloadButton.className = 'file-download';
+        downloadButton.textContent = 'Download';
+        downloadButton.onclick = () => {
+          const blob = new Blob([fileData.data], { type: fileData.type || 'application/octet-stream' });
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = fileData.name;
+          document.body.appendChild(a);
+          a.click();
+          setTimeout(() => {
+            document.body.removeChild(a);
+            window.URL.revokeObjectURL(url);
+          }, 100);
+        };
+        
+        fileDiv.appendChild(downloadButton);
+      } else if (isMyFile) {
+        // For sent files, show "Sending..." initially
+        const statusDiv = document.createElement('div');
+        statusDiv.className = 'file-status';
+        statusDiv.textContent = 'Sending...';
+        fileDiv.appendChild(statusDiv);
+        
+        // Store reference to status div for updates
+        fileData.statusElement = statusDiv;
+      }
+      
+      header.appendChild(author);
+      header.appendChild(timestamp);
+      content.appendChild(header);
+      content.appendChild(fileDiv);
+      
+      container.appendChild(avatar);
+      container.appendChild(content);
+      
+      chatContainer.appendChild(container);
+      chatContainer.scrollTop = chatContainer.scrollHeight;
+    }
+    
+    // Format file size for display
+    function formatFileSize(bytes) {
+      if (bytes < 1024) return bytes + ' bytes';
+      else if (bytes < 1048576) return (bytes / 1024).toFixed(1) + ' KB';
+      else if (bytes < 1073741824) return (bytes / 1048576).toFixed(1) + ' MB';
+      else return (bytes / 1073741824).toFixed(1) + ' GB';
+    }
+    
+    // Handle file selection
+    function handleFileSelect() {
+      if (fileInput.files.length === 0) {
+        selectedFile = null;
+        selectedFileName.textContent = '';
+        return;
+      }
+      
+      selectedFile = fileInput.files[0];
+      selectedFileName.textContent = selectedFile.name;
+      debugLog(`File selected: ${selectedFile.name}, ${formatFileSize(selectedFile.size)}`);
+    }
+    
+    // Send a chat message
+    function sendMessage() {
+      const text = messageInput.value.trim();
+      
+      // If there's a file selected, send it
+      if (selectedFile) {
+        sendFile();
+        return;
+      }
+      
+      if (!text) return;
+      
+      if (dataChannel && dataChannel.readyState === 'open') {
+        const message = {
+          type: 'message',
+          text: text,
+          timestamp: Date.now()
+        };
+        
+        dataChannel.send(JSON.stringify(message));
+        addMessage(text, 'me');
+        messageInput.value = '';
+      } else {
+        addMessage("Can't send message: Not connected", 'system');
+      }
+    }
+    
+    // Send a file
+    function sendFile() {
+      if (!selectedFile) {
+        addMessage("No file selected", 'system');
+        return;
+      }
+      
+      if (!dataChannel || dataChannel.readyState !== 'open') {
+        addMessage("Can't send file: Not connected", 'system');
+        return;
+      }
+      
+      // Show progress bar
+      progressContainer.style.display = 'block';
+      progressBar.style.width = '0%';
+      
+      // First, send file metadata
+      const fileMetadata = {
+        type: 'file-meta',
+        name: selectedFile.name,
+        size: selectedFile.size,
+        fileType: selectedFile.type,
+        timestamp: Date.now()
+      };
+      
+      // Add file message to chat
+      addFileMessage({
+        name: selectedFile.name,
+        size: selectedFile.size,
+        type: selectedFile.type
+      }, true);
+      
+      // Send metadata
+      dataChannel.send(JSON.stringify(fileMetadata));
+      
+      // Read and send the file in chunks
+      const reader = new FileReader();
+      let offset = 0;
+      
+      reader.onload = function(event) {
+        if (!dataChannel || dataChannel.readyState !== 'open') {
+          progressContainer.style.display = 'none';
+          addMessage("Connection lost during file transfer", 'system');
+          return;
+        }
+        
+        const chunk = event.target.result;
+        dataChannel.send(chunk);
+        
+        offset += chunk.byteLength;
+        const progress = Math.min(100, (offset / selectedFile.size) * 100);
+        progressBar.style.width = progress + '%';
+        
+        // Update status in the chat
+        if (fileMetadata.statusElement) {
+          fileMetadata.statusElement.textContent = `Sending: ${Math.round(progress)}%`;
+        }
+        
+        // If not all data has been sent, read the next chunk
+        if (offset < selectedFile.size) {
+          readSlice(offset);
+        } else {
+          // Done sending
+          progressContainer.style.display = 'none';
+          selectedFile = null;
+          fileInput.value = '';
+          selectedFileName.textContent = '';
+          
+          // Update status in the chat
+          if (fileMetadata.statusElement) {
+            fileMetadata.statusElement.textContent = 'Sent';
+          }
+          
+          addMessage(`File "${fileMetadata.name}" sent successfully`, 'system');
+          debugLog(`File sent: ${fileMetadata.name}`);
+        }
+      };
+      
+      function readSlice(offset) {
+        const slice = selectedFile.slice(offset, offset + CHUNK_SIZE);
+        reader.readAsArrayBuffer(slice);
+      }
+      
+      // Start reading
+      readSlice(0);
+    }
+    
+    // WebRTC Connection setup
+    function createConnection() {
+      resetConnection();
+      
+      // Update UI
+      createButton.disabled = true;
+      joinButton.disabled = true;
+      copyButton.style.display = 'block';
+      connectionStatus.textContent = "Creating connection...";
+      
+      debugLog("Creating connection as host");
+      
+      // Set up peer connection
+      peer = new RTCPeerConnection({
+        iceServers: [
+          { urls: 'stun:stun.l.google.com:19302' },
+          { urls: 'stun:stun1.l.google.com:19302' },
+          { urls: 'stun:stun2.l.google.com:19302' },
+          { urls: 'stun:stun3.l.google.com:19302' },
+          { 
+            urls: 'turn:numb.viagenie.ca:3478',
+            username: 'webrtc@live.com',
+            credential: 'muazkh'
+          }
+        ]
+      });
+      
+      // Create data channel for chat
+      dataChannel = peer.createDataChannel("chat");
+      setupDataChannel();
+      
+      // Set up audio
+      setupAudio().then(success => {
+        if (success) {
+          // Add audio tracks to connection
+          if (localStream) {
+            localStream.getTracks().forEach(track => {
+              peer.addTrack(track, localStream);
+              debugLog(`Added local ${track.kind} track to connection`);
+            });
+          }
+        }
+        
+        // ICE candidate handling
+        setupICEHandling();
+        
+        // Create offer
+        peer.createOffer()
+          .then(offer => {
+            debugLog("Offer created");
+            return peer.setLocalDescription(offer);
+          })
+          .then(() => {
+            debugLog("Local description set");
+          })
+          .catch(error => {
+            debugLog(`Error creating offer: ${error.message}`, 'error');
+            connectionStatus.textContent = "Error creating connection";
+            resetConnectionButtons();
+          });
+      });
+    }
+    
+    function joinConnection() {
+      resetConnection();
+      
+      // Update UI
+      createButton.disabled = true;
+      joinButton.disabled = true;
+      connectionStatus.textContent = "Ready to join. Paste connection code and click Connect.";
+      
+      debugLog("Preparing to join as guest");
+      
+      // Set up peer connection
+      peer = new RTCPeerConnection({
+        iceServers: [
+          { urls: 'stun:stun.l.google.com:19302' },
+          { urls: 'stun:stun1.l.google.com:19302' },
+          { urls: 'stun:stun2.l.google.com:19302' },
+          { urls: 'stun:stun3.l.google.com:19302' },
+          { 
+            urls: 'turn:numb.viagenie.ca:3478',
+            username: 'webrtc@live.com',
+            credential: 'muazkh'
+          }
+        ]
+      });
+      
+      // Handle data channel
+      peer.ondatachannel = event => {
+        dataChannel = event.channel;
+        debugLog("Data channel received");
+        setupDataChannel();
+      };
+      
+      // Set up audio
+      setupAudio().then(success => {
+        if (success) {
+          // Add tracks to connection
+          if (localStream) {
+            localStream.getTracks().forEach(track => {
+              peer.addTrack(track, localStream);
+              debugLog(`Added local ${track.kind} track to connection`);
+            });
+          }
+        }
+        
+        // ICE candidate handling
+        setupICEHandling();
+      });
+    }
+    
+    function connectWithCode() {
+      const remoteCode = remoteCodeElement.value.trim();
+      if (!remoteCode) {
+        connectionStatus.textContent = "Please paste a connection code first";
+        return;
+      }
+      
+      try {
+        const signal = JSON.parse(remoteCode);
+        connectButton.disabled = true;
+        
+        if (signal.type === 'offer') {
+          // We're joining an existing connection
+          debugLog("Processing offer");
+          connectionStatus.textContent = "Connecting...";
+          
+          peer.setRemoteDescription(new RTCSessionDescription(signal))
+            .then(() => {
+              debugLog("Remote description set");
+              return peer.createAnswer();
+            })
+            .then(answer => {
+              debugLog("Answer created");
+              return peer.setLocalDescription(answer);
+            })
+            .catch(error => {
+              debugLog(`Connection error: ${error.message}`, 'error');
+              connectionStatus.textContent = "Connection failed";
+              connectButton.disabled = false;
+            });
+        } else if (signal.type === 'answer') {
+          // We created the connection and are receiving the answer
+          debugLog("Processing answer");
+          connectionStatus.textContent = "Completing connection...";
+          
+          peer.setRemoteDescription(new RTCSessionDescription(signal))
+            .then(() => {
+              debugLog("Remote description set");
+            })
+            .catch(error => {
+              debugLog(`Connection error: ${error.message}`, 'error');
+              connectionStatus.textContent = "Connection failed";
+              connectButton.disabled = false;
+            });
+        } else {
+          throw new Error("Invalid connection code");
+        }
+      } catch (e) {
+        debugLog(`Invalid connection code: ${e.message}`, 'error');
+        connectionStatus.textContent = "Invalid connection code";
+      }
+    }
+    
+    function setupICEHandling() {
+      peer.onicecandidate = event => {
+        if (!event.candidate) {
+          // ICE gathering complete
+          debugLog("ICE gathering complete");
+          localCodeElement.value = JSON.stringify(peer.localDescription);
+          connectionStatus.textContent = "Connection code ready! Share it with the other person.";
+        }
+      };
+      
+      peer.oniceconnectionstatechange = () => {
+        debugLog(`ICE connection state: ${peer.iceConnectionState}`);
+        
+        if (peer.iceConnectionState === 'connected' || peer.iceConnectionState === 'completed') {
+          connectionContainer.style.display = 'none'; // Hide the connection modal
+          connectionStatus.textContent = "Connected!";
+          addMessage("Connection established!", 'system');
+          
+          // Add the peer to the members list
+          addMemberToList("Peer456", "P");
+        } else if (peer.iceConnectionState === 'failed' || peer.iceConnectionState === 'disconnected') {
+          connectionStatus.textContent = "Connection problems...";
+          if (peer.iceConnectionState === 'failed') {
+            addMessage("Connection failed. Try again with a new connection.", 'system');
+          }
+        } else if (peer.iceConnectionState === 'closed') {
+          connectionStatus.textContent = "Connection closed";
+          addMessage("Connection closed", 'system');
+          disableChat();
+          
+          // Show the connection modal again
+          connectionContainer.style.display = 'flex';
+          
+          // Remove peer from members list
+          removeMemberFromList("Peer456");
+        }
+      };
+      
+      peer.ontrack = event => {
+        debugLog(`Remote ${event.track.kind} track received`);
+        
+        if (event.track.kind === 'audio') {
+          // Handle remote audio stream
+          remoteStream = event.streams[0];
+          
+          // Create audio element
+          let audio = document.getElementById('remote-audio');
+          if (!audio) {
+            audio = document.createElement('audio');
+            audio.id = 'remote-audio';
+            audio.autoplay = true;
+            document.body.appendChild(audio);
+          }
+          
+          audio.srcObject = remoteStream;
+          
+          debugLog("Remote audio connected");
+          addMessage("Voice chat connected", 'system');
+        }
+      };
+    }
+    
+    function setupDataChannel() {
+      dataChannel.onopen = () => {
+        debugLog("Data channel opened");
+        enableChat();
+        addMessage("Chat connected", 'system');
+      };
+      
+      dataChannel.onclose = () => {
+        debugLog("Data channel closed");
+        disableChat();
+        addMessage("Chat disconnected", 'system');
+      };
+      
+      dataChannel.onerror = error => {
+        debugLog(`Data channel error: ${error}`, 'error');
+      };
+      
+      dataChannel.onmessage = event => {
+        // Check if this is a binary message (file chunk)
+        if (event.data instanceof ArrayBuffer) {
+          handleFileChunk(event.data);
+          return;
+        }
+        
+        try {
+          const message = JSON.parse(event.data);
+          
+          switch (message.type) {
+            case 'message':
+              addMessage(message.text, 'them');
+              break;
+            
+            case 'file-meta':
+              // Start receiving a file
+              fileInfo = message;
+              receiveBuffer = [];
+              receivedSize = 0;
+              
+              // Add file notification in chat
+              addMessage(`Receiving file: ${message.name}`, 'system');
+              break;
+            
+            case 'ping':
+              // Echo back pings
+              dataChannel.send(JSON.stringify({
+                type: 'pong',
+                timestamp: Date.now()
+              }));
+              break;
+              
+            default:
+              // Handle other message types as needed
+              debugLog(`Received message of type: ${message.type}`);
+          }
+        } catch (e) {
+          // Simple text message fallback
+          addMessage(event.data, 'them');
+        }
+      };
+    }
+    
+    // Handle received file chunks
+    function handleFileChunk(data) {
+      // Add the chunk to our buffer
+      receiveBuffer.push(data);
+      receivedSize += data.byteLength;
+      
+      // Check if we've received the entire file
+      if (fileInfo && receivedSize === fileInfo.size) {
+        // File is complete - combine chunks
+        const received = new Blob(receiveBuffer);
+        receiveBuffer = [];
+        
+        // Add file message with download button
+        addFileMessage({
+          name: fileInfo.name,
+          size: fileInfo.size,
+          type: fileInfo.fileType,
+          data: received
+        }, false);
+        
+        addMessage(`File "${fileInfo.name}" received`, 'system');
+        debugLog(`File received: ${fileInfo.name}, size: ${formatFileSize(fileInfo.size)}`);
+        
+        // Reset file info
+        fileInfo = null;
+      }
+    }
+    
+    async function setupAudio() {
+      try {
+        // Request microphone access
+        localStream = await navigator.mediaDevices.getUserMedia({ audio: true, video: false });
+        
+        // Setup audio context for visualization
+        audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        audioAnalyser = audioContext.createAnalyser();
+        const microphone = audioContext.createMediaStreamSource(localStream);
+        microphone.connect(audioAnalyser);
+        audioAnalyser.fftSize = 256;
+        const bufferLength = audioAnalyser.frequencyBinCount;
+        audioDataArray = new Uint8Array(bufferLength);
+        
+        debugLog("Microphone access granted");
+        addMessage("Microphone connected", 'system');
+        
+        return true;
+      } catch (err) {
+        debugLog(`Error accessing microphone: ${err.message}`, 'error');
+        addMessage("Could not access microphone", 'system');
+        return false;
+      }
+    }
+    
+    function toggleMicrophone() {
+      if (!localStream) {
+        addMessage("No microphone available", 'system');
+        return;
+      }
+      
+      micMuted = !micMuted;
+      localStream.getAudioTracks().forEach(track => {
+        track.enabled = !micMuted;
+      });
+      
+      if (micMuted) {
+        micToggleBtn.innerHTML = '<span>🔇</span>';
+        micToggleBtn.classList.add('muted');
+        addMessage("Microphone muted", 'system');
+      } else {
+        micToggleBtn.innerHTML = '<span>🎙️</span>';
+        micToggleBtn.classList.remove('muted');
+        addMessage("Microphone unmuted", 'system');
+      }
+    }
+    
+    function toggleAudio() {
+      if (!remoteStream) {
+        addMessage("No remote audio connected", 'system');
+        return;
+      }
+      
+      audioMuted = !audioMuted;
+      remoteStream.getAudioTracks().forEach(track => {
+        track.enabled = !audioMuted;
+      });
+      
+      const audio = document.getElementById('remote-audio');
+      if (audio) {
+        audio.muted = audioMuted;
+      }
+      
+      if (audioMuted) {
+        audioToggleBtn.innerHTML = '<span>🔇</span>';
+        audioToggleBtn.classList.add('muted');
+        addMessage("Remote audio muted", 'system');
+      } else {
+        audioToggleBtn.innerHTML = '<span>🔊</span>';
+        audioToggleBtn.classList.remove('muted');
+        addMessage("Remote audio unmuted", 'system');
+      }
+    }
+    
+    function copyConnectionCode() {
+      localCodeElement.select();
+      document.execCommand('copy');
+      
+      // Visual feedback
+      const originalText = connectionStatus.textContent;
+      connectionStatus.textContent = "Connection code copied to clipboard!";
+      setTimeout(() => {
+        connectionStatus.textContent = originalText;
+      }, 2000);
+    }
+    
+    function enableChat() {
+      messageInput.disabled = false;
+      messageInput.placeholder = "Message #secure-chat";
+      messageInput.focus();
+    }
+    
+    function disableChat() {
+      messageInput.disabled = true;
+      messageInput.placeholder = "Connect to start messaging";
+    }
+    
+    function resetConnection() {
+      if (peer) {
+        peer.close();
+      }
+      if (dataChannel) {
+        dataChannel.close();
+      }
+      
+      disableChat();
+    }
+    
+    function resetConnectionButtons() {
+      createButton.disabled = false;
+      joinButton.disabled = false;
+      connectButton.disabled = false;
+    }
+    
+    function addMemberToList(name, initial) {
+      // Check if member already exists
+      const members = document.querySelectorAll('.member-name');
+      for (let i = 0; i < members.length; i++) {
+        if (members[i].textContent === name) {
+          return;
+        }
+      }
+      
+      const membersList = document.querySelector('.members-list .member-group');
+      
+      const memberDiv = document.createElement('div');
+      memberDiv.className = 'member';
+      memberDiv.dataset.username = name;
+      
+      const avatar = document.createElement('div');
+      avatar.className = 'member-avatar';
+      avatar.textContent = initial;
+      
+      const nameSpan = document.createElement('div');
+      nameSpan.className = 'member-name';
+      nameSpan.textContent = name;
+      
+      memberDiv.appendChild(avatar);
+      memberDiv.appendChild(nameSpan);
+      
+      membersList.appendChild(memberDiv);
+      
+      // Update member count
+      updateMemberCount();
+    }
+    
+    function removeMemberFromList(name) {
+      const members = document.querySelectorAll('.member');
+      for (let i = 0; i < members.length; i++) {
+        if (members[i].dataset.username === name) {
+          members[i].remove();
+          break;
+        }
+      }
+      
+      // Update member count
+      updateMemberCount();
+    }
+    
+    function updateMemberCount() {
+      const memberCount = document.querySelectorAll('.member').length;
+      const membersHeader = document.querySelector('.members-header');
+      membersHeader.textContent = `Members — ${memberCount}`;
+      
+      const memberGroupName = document.querySelector('.member-group-name');
+      memberGroupName.textContent = `Online — ${memberCount}`;
+    }
+    
+    // Initialize the app
+    init();
+    
+    // Add current user to members list
+    addMemberToList("User123", "U");
+  </script>
+</body>
+</html>

@@ -1,0 +1,2 @@
+class ZMQNotification:
+    pass

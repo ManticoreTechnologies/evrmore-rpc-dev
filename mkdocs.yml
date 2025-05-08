@@ -1,0 +1,108 @@
+site_name: Evrmore RPC
+site_description: A high-performance Python wrapper for Evrmore blockchain RPC commands with a seamless API
+site_author: Manticore Technology
+site_url: https://manticoretechnology.github.io/evrmore-rpc/
+
+repo_name: ManticoreTechnology/evrmore-rpc
+repo_url: https://github.com/ManticoreTechnology/evrmore-rpc
+edit_uri: edit/main/docs/
+
+theme:
+  name: material
+  logo: assets/logo.svg
+  favicon: assets/favicon.png
+  icon:
+    repo: fontawesome/brands/github
+  palette:
+    # Light mode
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+    # Dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+  features:
+    # Navigation
+    - navigation.sections
+    - navigation.indexes
+    - navigation.expand
+    - navigation.path
+    - navigation.footer
+    - navigation.tracking
+    
+    # Table of contents
+    - toc.follow
+    - toc.integrate
+    
+    # Search 
+    - search.highlight
+    - search.share
+    
+    # Content
+    - content.code.copy
+    - content.code.annotate
+
+extra_css:
+  - assets/extra.css
+
+markdown_extensions:
+  - admonition
+  - codehilite
+  - footnotes
+  - meta
+  - pymdownx.highlight:
+      anchor_linenums: true
+      line_spans: __span
+      pygments_lang_class: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - pymdownx.superfences
+  - pymdownx.tabbed:
+      alternate_style: true
+  - pymdownx.tasklist:
+      custom_checkbox: true
+  - toc:
+      permalink: true
+      title: Table of contents
+
+nav:
+  - Home: index.md
+  - API Reference:
+    - Overview: api_reference.md
+    - Synchronous API: sync_api.md
+    - Asynchronous API: async_api.md
+    - ZMQ Support: zmq.md
+    - WebSockets Support: websockets.md
+    - Models: models.md
+  - Examples: examples.md
+  - Advanced Usage: advanced.md
+  - Development: development.md
+
+plugins:
+  - search
+  - mkdocstrings:
+      handlers:
+        python:
+          selection:
+            docstring_style: google
+          rendering:
+            show_source: true
+            show_root_heading: true
+
+extra:
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/ManticoreTechnology/evrmore-rpc
+    - icon: fontawesome/brands/python
+      link: https://pypi.org/project/evrmore-rpc/
+
+copyright: Copyright &copy; 2025 Manticore Technology 
