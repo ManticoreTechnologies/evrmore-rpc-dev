@@ -16,6 +16,9 @@ Each method creates a working EvrmoreClient and queries the current block count.
 - Environments with `.cookie` or local node setup
 - Docker/container workflows using env vars
 - Hardcoded configs in CLI tools or apps
+
+© 2025 Manticore Technologies, LLC
+Maintained by: Cymos (EfletL7gMLYkuu9CfHcRevVk3KdnG5JgruSE)
 """
 
 import os

@@ -10,6 +10,9 @@ Although results are runtime `dict` objects, function signatures are explicitly 
 - IDE autocomplete & tooltips
 - Static analysis (mypy, pylance, etc.)
 - Fewer runtime mistakes
+
+© 2025 Manticore Technologies, LLC
+Maintained by: Cymos (EfletL7gMLYkuu9CfHcRevVk3KdnG5JgruSE)
 """
 
 from evrmore_rpc import EvrmoreClient

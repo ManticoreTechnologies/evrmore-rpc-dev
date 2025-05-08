@@ -9,6 +9,9 @@ to avoid the overhead of creating a new connection per request.
 ✅ One connection reused across multiple calls
 ✅ Works for both sync and async modes
 ✅ Improves performance and resource usage
+
+© 2025 Manticore Technologies, LLC
+Maintained by: Cymos (EfletL7gMLYkuu9CfHcRevVk3KdnG5JgruSE)
 """
 
 # ─── Imports ──────────────────────────────────────────────

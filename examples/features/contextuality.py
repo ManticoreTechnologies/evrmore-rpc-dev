@@ -17,6 +17,9 @@ This is ideal for:
 ✅ No wrappers
 ✅ No separate client classes
 ✅ One consistent API surface
+
+© 2025 Manticore Technologies, LLC
+Maintained by: Cymos (EfletL7gMLYkuu9CfHcRevVk3KdnG5JgruSE)
 """
 
 # ─── Imports ──────────────────────────────────────────────
