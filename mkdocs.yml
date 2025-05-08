@@ -76,13 +76,11 @@ markdown_extensions:
 
 nav:
   - Home: index.md
-  - API Reference:
-    - Overview: api_reference.md
-    - Synchronous API: sync_api.md
-    - Asynchronous API: async_api.md
-    - ZMQ Support: zmq.md
-    - WebSockets Support: websockets.md
-    - Models: models.md
+  - Getting Started: getting-started.md
+  - API Reference: api-reference.md
+  - Real-Time Notifications:
+    - ZMQ Guide: zmq.md
+    - WebSocket Guide: websockets.md
   - Examples: examples.md
   - Advanced Usage: advanced.md
   - Development: development.md
@@ -105,4 +103,4 @@ extra:
     - icon: fontawesome/brands/python
       link: https://pypi.org/project/evrmore-rpc/
 
-copyright: Copyright &copy; 2025 Manticore Technology 
+copyright: Copyright &copy; 2024 Manticore Technology 
