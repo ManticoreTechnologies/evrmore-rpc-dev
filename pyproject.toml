@@ -55,10 +55,10 @@ all = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/ManticoreTechnology/evrmore-rpc"
+Homepage = "https://github.com/ManticoreTechnology/evrmore-rpc-dev"
 Documentation = "https://evrmore-rpc.readthedocs.io/"
-Repository = "https://github.com/ManticoreTechnology/evrmore-rpc.git"
-Issues = "https://github.com/ManticoreTechnology/evrmore-rpc/issues"
+Repository = "https://github.com/ManticoreTechnology/evrmore-rpc-dev.git"
+Issues = "https://github.com/ManticoreTechnology/evrmore-rpc-dev/issues"
 
 [project.scripts]
 evrmore-rpc-stress = "evrmore_rpc.stress_test:main"
