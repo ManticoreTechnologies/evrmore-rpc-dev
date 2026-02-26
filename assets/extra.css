@@ -1,6 +1,35 @@
-/* Custom Styles for Evrmore RPC Documentation */
+/* Custom styles for Evrmore RPC docs, aligned with manticore.technology */
 
-/* Sidebar styling */
+:root {
+  /* Brand + surface colors (approximate to main site) */
+  --manticore-bg: #050509;
+  --manticore-surface: #11111a;
+  --manticore-surface-alt: #181827;
+  --manticore-accent: #ffb300;
+  --manticore-accent-soft: rgba(255, 179, 0, 0.16);
+
+  /* Tie into Material theme variables */
+  --md-default-bg-color: var(--manticore-bg);
+  --md-primary-fg-color: var(--manticore-accent);
+  --md-accent-fg-color: var(--manticore-accent);
+  --md-typeset-a-color: var(--manticore-accent);
+}
+
+/* Global background + typography feel */
+body,
+.md-main,
+.md-main__inner,
+.md-content,
+.md-sidebar,
+.md-footer {
+  background-color: var(--manticore-bg);
+}
+
+.md-header {
+  background: radial-gradient(circle at top center, #302040 0, #050509 55%);
+  box-shadow: 0 0 0 1px rgba(255, 179, 0, 0.16);
+}
+
 .md-nav {
   font-size: 0.9rem;
 }
@@ -15,9 +44,28 @@
   font-weight: 600;
 }
 
-/* Article styling */
+.md-sidebar--primary,
+.md-sidebar--secondary {
+  background-color: var(--manticore-surface);
+}
+
+.md-typeset {
+  color: #f5f5f7;
+}
+
+.md-typeset h1,
+.md-typeset h2,
+.md-typeset h3 {
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
+.md-typeset h1 {
+  color: var(--manticore-accent);
+}
+
 .md-content {
-  max-width: 900px;
+  max-width: 980px;
   margin: 0 auto;
 }
 
@@ -27,11 +75,21 @@
 
 /* Code blocks */
 .highlight {
-  border-radius: 4px;
+  border-radius: 6px;
+  background: radial-gradient(circle at top left, #2b203c 0, #0b0b12 60%);
+  box-shadow: 0 0 0 1px rgba(255, 179, 0, 0.08);
 }
 
 .highlight pre {
   padding: 1rem;
+}
+
+/* Inline code */
+.md-typeset code {
+  font-size: 0.9em;
+  background-color: rgba(255, 179, 0, 0.08);
+  border-radius: 3px;
+  padding: 0.05em 0.35em;
 }
 
 /* Tables */
@@ -40,17 +98,19 @@
 }
 
 .md-typeset table:not([class]) th {
-  background-color: #5c6bc0;
-  color: #fff;
+  background-color: var(--manticore-accent);
+  color: #050509;
 }
 
-/* Admonitions */
+/* Admonitions / callouts */
 .md-typeset .admonition,
 .md-typeset details {
   border-left-width: 4px;
+  border-radius: 4px;
+  background-color: var(--manticore-surface-alt);
 }
 
-/* TOC on the right side */
+/* Grid / layout */
 .md-grid {
   max-width: 1440px;
 }
@@ -61,7 +121,7 @@
 
 .md-sidebar--secondary .md-nav__title {
   font-size: 0.8rem;
-  color: #666;
+  color: #888aa6;
   text-transform: uppercase;
 }
 
@@ -77,28 +137,17 @@
   }
 }
 
-/* Homepage styling */
-.md-typeset h1 {
-  font-weight: 600;
-  color: #5c6bc0;
-}
-
-/* API method styling */
-.md-typeset code {
-  font-size: 0.9em;
-}
-
-/* Method parameters */
+/* Method documentation helpers */
 .doc-attribute {
   margin-bottom: 1rem;
 }
 
 .doc-attribute__name {
   font-weight: 600;
-  color: #5c6bc0;
+  color: var(--manticore-accent);
 }
 
 /* Better scrolling on mobile */
 html {
   scroll-padding-top: 4rem;
-} 
+}
